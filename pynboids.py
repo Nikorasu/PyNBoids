@@ -6,7 +6,7 @@ from random import randint
 
 WIDTH = 1200
 HEIGHT = 800
-FPS = 42
+FPS = 48
 ICON = True
 
 # this class handles the individual boids
@@ -56,8 +56,8 @@ class Boid(pygame.sprite.Sprite):
             #this is slower
             #angleDiff = (self.angle - tAngle) % 360
             #if abs(angleDiff) > 180: angleDiff += angleDiff > 0 and -360 or 360
-            if angleDiff < 0: self.angle += 2
-            elif angleDiff > 0: self.angle -= 2
+            if angleDiff < 0 : self.angle += 2
+            elif angleDiff > 0 : self.angle -= 2
             self.angle %= 360
             #if self.angle > 360: self.angle = 0 + (self.angle % 360)
             #if self.angle < 0: self.angle = 360 - (-self.angle % 360)
@@ -73,17 +73,17 @@ class Boid(pygame.sprite.Sprite):
         window = pygame.display.get_surface().get_rect()
         # screen wrap
         if not window.contains(self.rect):
-            if self.rect.centery < 0: self.pos.y = window.h
-            if self.rect.centery > window.h: self.pos.y = 0
-            if self.rect.centerx < 0: self.pos.x = window.w
-            if self.rect.centerx > window.w: self.pos.x = 0
+            if self.rect.centery < 0 : self.pos.y = window.h
+            if self.rect.centery > window.h : self.pos.y = 0
+            if self.rect.centerx < 0 : self.pos.x = window.w
+            if self.rect.centerx > window.w : self.pos.x = 0
         # Actually update position of boid
         self.rect.center = self.pos
 
 def main():
     pygame.init()
     pygame.display.set_caption("PyNBoids")
-    if ICON: pygame.display.set_icon(pygame.image.load("nboids.png"))
+    if ICON : pygame.display.set_icon(pygame.image.load("nboids.png"))
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 
     nBoids = pygame.sprite.Group()
