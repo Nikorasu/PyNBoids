@@ -1,4 +1,5 @@
 import pygame
+from math import sin, cos, atan2, radians, degrees
 from random import randint
 
 # Made by Nik
@@ -40,17 +41,24 @@ class Boid(pygame.sprite.Sprite):
         neiboids.sort(key=lambda i: pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(i.rect.center)))
         del neiboids[7:] # keep 7 closest, dump the rest
         # next we get the averaged center coordinate for all neighbors, storing it as targetV
-        xt = yt = 0
+        xvt = yvt = yat = xat = 0
         ncount = len(neiboids)
         if ncount > 0:
             for nBoid in neiboids:
-                xt += nBoid.rect.centerx
-                yt += nBoid.rect.centery
+                xvt += nBoid.rect.centerx
+                yvt += nBoid.rect.centery
+                yat += sin(radians(nBoid.angle))
+                xat += cos(radians(nBoid.angle))
+
+            tAvejAng = round(degrees(atan2(yat, xat)))
             # PLANS: if other boids get closer than 32, set them to target and fly away
             # also, average angles of neiboids and use when in certain range
-            targetV = (xt / ncount, yt / ncount)
+            targetV = (xvt / ncount, yvt / ncount)
             tDiff = targetV - pygame.Vector2(self.rect.center)
-            tAngle = pygame.math.Vector2.as_polar(tDiff)[1] # [0] has distance
+            tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff) #[1] angle #[0] has distance
+            #if distance < 100ish but > say 32 : self.angle = targetAng
+            if tDistance < 64 : tAngle = tAvejAng
+
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             #this is slower
