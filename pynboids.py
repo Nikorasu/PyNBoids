@@ -23,7 +23,7 @@ class Boid(pygame.sprite.Sprite):
         w, h = pygame.display.get_surface().get_size()
         self.rect = self.image.get_rect(center=(randint(0,w), randint(0,h))) #.get_rect(center=(w/2, h/2))
         self.angle = randint(0,360)
-        self.pos = self.rect.center # pygame.Vector2(self.rect.center)
+        self.pos = pygame.Vector2(self.rect.center)
 
     def update(self, events, dt): # pretty much all their logic is in here
         # this bit checks all other boids to see who's nearby, and manages a list of neighbors
@@ -51,21 +51,18 @@ class Boid(pygame.sprite.Sprite):
                 xat += cos(radians(nBoid.angle))
 
             tAvejAng = round(degrees(atan2(yat, xat)))
-            # PLANS: if other boids get closer than 32, set them to target and fly away
-            # also, average angles of neiboids and use when in certain range
             targetV = (xvt / ncount, yvt / ncount)
+            if pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(neiboids[0].rect.center)) < 12 : targetV = neiboids[0].rect.center
             tDiff = targetV - pygame.Vector2(self.rect.center)
             tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff) #[1] angle #[0] has distance
-            #if distance < 100ish but > say 32 : self.angle = targetAng
-            if tDistance < 64 : tAngle = tAvejAng # + randint(-30,30)
 
+            if tDistance < 64 : tAngle = tAvejAng # + randint(-30,30)
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             #this is slower
             #angleDiff = (self.angle - tAngle) % 360
             #if abs(angleDiff) > 180: angleDiff += angleDiff > 0 and -360 or 360
-            if tDistance < 10 : angleDiff = -angleDiff
-
+            if tDistance < 12 : angleDiff = -angleDiff
             if angleDiff < 0 : self.angle += 2
             elif angleDiff > 0 : self.angle -= 2
             self.angle %= 360
@@ -77,7 +74,7 @@ class Boid(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center) # important fix
 
         self.direction = pygame.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * 100 * dt / 1000
+        next_pos = self.pos + self.direction * 142 * dt / 1000
         self.pos = next_pos
 
         window = pygame.display.get_surface().get_rect()
