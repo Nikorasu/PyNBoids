@@ -57,13 +57,15 @@ class Boid(pygame.sprite.Sprite):
             tDiff = targetV - pygame.Vector2(self.rect.center)
             tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff) #[1] angle #[0] has distance
             #if distance < 100ish but > say 32 : self.angle = targetAng
-            if tDistance < 64 : tAngle = tAvejAng
+            if tDistance < 64 : tAngle = tAvejAng # + randint(-30,30)
 
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             #this is slower
             #angleDiff = (self.angle - tAngle) % 360
             #if abs(angleDiff) > 180: angleDiff += angleDiff > 0 and -360 or 360
+            if tDistance < 10 : angleDiff = -angleDiff
+
             if angleDiff < 0 : self.angle += 2
             elif angleDiff > 0 : self.angle -= 2
             self.angle %= 360
