@@ -5,10 +5,10 @@ from random import randint
 # Made by Nik
 # This is an attempt to recreate the biods simulation myself.
 
+BOIDZ = 80 # how many boids to spawn, slow after 100-200ish
 WIDTH = 1200
 HEIGHT = 800
 FPS = 48
-ICON = True
 
 # this class handles the individual boids
 class Boid(pygame.sprite.Sprite):
@@ -36,7 +36,6 @@ class Boid(pygame.sprite.Sprite):
         neiboids = pygame.sprite.spritecollide(self, self.groups()[0].sprites(), False, pygame.sprite.collide_circle_ratio(8))
         neiboids.remove(self)  # neiboids = [] # might be needed b4 these
         # ^ this alternative sometimes seems slower.. up to 1 fps slower, but other way crashes?
-
         # sort the neighbors by their distance to self.. hopefully works
         neiboids.sort(key=lambda i: pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(i.rect.center)))
         del neiboids[7:] # keep 7 closest, dump the rest
@@ -49,36 +48,35 @@ class Boid(pygame.sprite.Sprite):
                 yvt += nBoid.rect.centery
                 yat += sin(radians(nBoid.angle))
                 xat += cos(radians(nBoid.angle))
-
+            # computes average angle and vector for neighbors
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
             if pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(neiboids[0].rect.center)) < 12 : targetV = neiboids[0].rect.center
             tDiff = targetV - pygame.Vector2(self.rect.center)
             tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff) #[1] angle #[0] has distance
-
-            if tDistance < 64 : tAngle = tAvejAng # + randint(-30,30)
+            # if boid is close enough to neighbors, match their average angle
+            if tDistance < 64 : tAngle = tAvejAng
+            # computes the difference to reach target angle, for smooth steering
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
-            #this is slower
-            #angleDiff = (self.angle - tAngle) % 360
+            #angleDiff = (self.angle - tAngle) % 360  # alternative method
             #if abs(angleDiff) > 180: angleDiff += angleDiff > 0 and -360 or 360
+            # if boid gets too close to targets, steer away
             if tDistance < 12 : angleDiff = -angleDiff
             if angleDiff < 0 : self.angle += 2
             elif angleDiff > 0 : self.angle -= 2
             self.angle %= 360
-            #if self.angle > 360: self.angle = 0 + (self.angle % 360)
-            #if self.angle < 0: self.angle = 360 - (-self.angle % 360)
 
         # adjusts angle of boid image to match heading
         self.image = pygame.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center) # important fix
-
+        # controls forward movement/speed
         self.direction = pygame.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * 142 * dt / 1000
         self.pos = next_pos
 
-        window = pygame.display.get_surface().get_rect()
         # screen wrap
+        window = pygame.display.get_surface().get_rect()
         if not window.contains(self.rect):
             if self.rect.centery < 0 : self.pos.y = window.h
             if self.rect.centery > window.h : self.pos.y = 0
@@ -90,13 +88,14 @@ class Boid(pygame.sprite.Sprite):
 def main():
     pygame.init()
     pygame.display.set_caption("PyNBoids")
-    if ICON : pygame.display.set_icon(pygame.image.load("nboids.png"))
+    try: pygame.display.set_icon(pygame.image.load("nboids.png"))
+    except: print("FYI: nboids.png icon not found, skipping..")
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 
     nBoids = pygame.sprite.Group()
-    for n in range(100): # Boid amount, 100-200 max
+    for n in range(BOIDZ):
         nBoids.add(Boid())
-    #BoidList = nBoids.sprites()
+
     clock = pygame.time.Clock()
     fpsDelayer = dt = 0
 
@@ -114,7 +113,7 @@ def main():
         dt = clock.tick(FPS)
 
         fpsDelayer+=1
-        if fpsDelayer>20:
+        if fpsDelayer>FPS:
             print(clock.get_fps())
             fpsDelayer=0
 
