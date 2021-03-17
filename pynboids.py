@@ -79,19 +79,19 @@ class Boid(pg.sprite.Sprite):
         self.rect.center = self.pos
 
 def main():
-    pg.init()
+    pg.init()  # prepare window
     pg.display.set_caption("PyNBoids")
     try: pg.display.set_icon(pg.image.load("nboids.png"))
     except: print("FYI: nboids.png icon not found, skipping..")
     screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
-
+    # spawns desired number of boids
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
         nBoids.add(Boid())
 
     clock = pg.time.Clock()
-    fpsDelayer = dt = 0
-
+    fpsChecker = dt = 0
+    # main loop
     while True:
         events = pg.event.get()
         for e in events:
@@ -104,13 +104,13 @@ def main():
         pg.display.update()
 
         dt = clock.tick(FPS)
-
-        fpsDelayer+=1
-        if fpsDelayer>FPS:
+        # quick debug to see fps in terminal
+        fpsChecker+=1
+        if fpsChecker>FPS:
             print(clock.get_fps())
-            fpsDelayer=0
+            fpsChecker=0
 
 if __name__ == '__main__':
     main()
-
+# by Nik
 pg.quit()
