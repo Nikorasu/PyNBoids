@@ -2,8 +2,8 @@ import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
 
-#  PyNBoids by Nik
-# This is an attempt to recreate the biods simulation myself.
+#  PyNBoids by Nik - WIP
+# This is an attempt to recreate the Biods simulation myself.
 
 BOIDZ = 80    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200
@@ -27,15 +27,8 @@ class Boid(pg.sprite.Sprite):
 
     def update(self, events, dt): # Most boid behavior done in here
         # checks all other boids to see who's nearby, and manages a list of neighbors
-        #for iBoid in self.groups()[0].sprites():
-        #    idist = pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(iBoid.rect.center))
-        #    if (idist < 128) and (iBoid != self) and not iBoid in neiboids:
-        #        neiboids.append(iBoid)
-        #    elif (idist > 128) and iBoid in neiboids:
-        #        neiboids.remove(iBoid)
         neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
         neiboids.remove(self)  # neiboids = [] # might be needed b4 these
-        # ^ this alternative sometimes seems 1fps slower, but the other way randomly crashed?
         # sort the neighbors by their distance to self.. seems to work
         neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
         del neiboids[7:]  # keep 7 closest, dump the rest
@@ -61,8 +54,6 @@ class Boid(pg.sprite.Sprite):
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
-            #angleDiff = (self.angle - tAngle) % 360  # alternative method
-            #if abs(angleDiff) > 180: angleDiff += angleDiff > 0 and -360 or 360
             # if boid gets too close to targets, steer away
             if tDistance < 12 : angleDiff = -angleDiff
             if angleDiff < 0 : self.angle += 2
@@ -80,10 +71,10 @@ class Boid(pg.sprite.Sprite):
         # screen wrap
         window = pg.display.get_surface().get_rect()
         if not window.contains(self.rect):
-            if self.rect.centery < 0 : self.pos.y = window.h
-            if self.rect.centery > window.h : self.pos.y = 0
-            if self.rect.centerx < 0 : self.pos.x = window.w
-            if self.rect.centerx > window.w : self.pos.x = 0
+            if self.rect.bottom < 0 : self.pos.y = window.h
+            if self.rect.top > window.h : self.pos.y = 0
+            if self.rect.right < 0 : self.pos.x = window.w
+            if self.rect.left > window.w : self.pos.x = 0
         # Actually update position of boid
         self.rect.center = self.pos
 
