@@ -3,7 +3,7 @@ from math import sin, cos, atan2, radians, degrees
 from random import randint
 
 #  PyNBoids by Nik - WIP
-# This is an attempt to recreate the Biods simulation myself.
+# This is an attempt to recreate the Boids simulation myself.
 
 BOIDZ = 80    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200
