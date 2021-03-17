@@ -1,29 +1,29 @@
-import pygame
+import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
 
-#  by Nik
+#  PyNBoids by Nik
 # This is an attempt to recreate the biods simulation myself.
 
-BOIDZ = 80    # how many boids to spawn, slow after 100-200ish
+BOIDZ = 80    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200
 HEIGHT = 800
 FPS = 48      # 60 is fine too
 
 # this class handles the individual boids
-class Boid(pygame.sprite.Sprite):
+class Boid(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((16, 16))
+        self.image = pg.Surface((16, 16))
         self.image.set_colorkey((0, 0, 0)) # self.image.fill((0, 0, 0))
         randcolor = (randint(50,200),randint(50,200),randint(50,200))
-        pygame.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
+        pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
         self.direction = (1, 0) # pygame.Vector2(0, -1)
-        w, h = pygame.display.get_surface().get_size()
+        w, h = pg.display.get_surface().get_size()
         self.rect = self.image.get_rect(center=(randint(0,w), randint(0,h)))
         self.angle = randint(0,360)
-        self.pos = pygame.Vector2(self.rect.center)
+        self.pos = pg.Vector2(self.rect.center)
 
     def update(self, events, dt): # Most boid behavior done in here
         # checks all other boids to see who's nearby, and manages a list of neighbors
@@ -33,11 +33,11 @@ class Boid(pygame.sprite.Sprite):
         #        neiboids.append(iBoid)
         #    elif (idist > 128) and iBoid in neiboids:
         #        neiboids.remove(iBoid)
-        neiboids = pygame.sprite.spritecollide(self, self.groups()[0].sprites(), False, pygame.sprite.collide_circle_ratio(8))
+        neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
         neiboids.remove(self)  # neiboids = [] # might be needed b4 these
         # ^ this alternative sometimes seems 1fps slower, but the other way randomly crashed?
         # sort the neighbors by their distance to self.. seems to work
-        neiboids.sort(key=lambda i: pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(i.rect.center)))
+        neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # prep variables for averages
         xvt = yvt = yat = xat = 0
@@ -52,10 +52,10 @@ class Boid(pygame.sprite.Sprite):
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
             # if closest neighbor is too close, set it as target to avoid
-            if pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(neiboids[0].rect.center)) < 12:
+            if pg.Vector2(self.rect.center).distance_to(pg.Vector2(neiboids[0].rect.center)) < 12:
                 targetV = neiboids[0].rect.center
-            tDiff = targetV - pygame.Vector2(self.rect.center)  # get angle differences for steering
-            tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff)  #[1] angle #[0] has distance
+            tDiff = targetV - pg.Vector2(self.rect.center)  # get angle differences for steering
+            tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)  #[1] angle #[0] has distance
             # if boid is close enough to neighbors, match their average angle
             if tDistance < 64 : tAngle = tAvejAng
             # computes the difference to reach target angle, for smooth steering
@@ -70,15 +70,15 @@ class Boid(pygame.sprite.Sprite):
             self.angle %= 360
 
         # adjusts angle of boid image to match heading
-        self.image = pygame.transform.rotate(self.org_image, -self.angle)
+        self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # centering fix
         # controls forward movement/speed
-        self.direction = pygame.Vector2(1, 0).rotate(self.angle).normalize()
+        self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * 142 * dt / 1000
         self.pos = next_pos
 
         # screen wrap
-        window = pygame.display.get_surface().get_rect()
+        window = pg.display.get_surface().get_rect()
         if not window.contains(self.rect):
             if self.rect.centery < 0 : self.pos.y = window.h
             if self.rect.centery > window.h : self.pos.y = 0
@@ -88,29 +88,29 @@ class Boid(pygame.sprite.Sprite):
         self.rect.center = self.pos
 
 def main():
-    pygame.init()
-    pygame.display.set_caption("PyNBoids")
-    try: pygame.display.set_icon(pygame.image.load("nboids.png"))
+    pg.init()
+    pg.display.set_caption("PyNBoids")
+    try: pg.display.set_icon(pg.image.load("nboids.png"))
     except: print("FYI: nboids.png icon not found, skipping..")
-    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
 
-    nBoids = pygame.sprite.Group()
+    nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
         nBoids.add(Boid())
 
-    clock = pygame.time.Clock()
+    clock = pg.time.Clock()
     fpsDelayer = dt = 0
 
     while True:
-        events = pygame.event.get()
+        events = pg.event.get()
         for e in events:
-            if e.type == pygame.QUIT:
+            if e.type == pg.QUIT:
                 return
 
         screen.fill((10, 10, 10))
         nBoids.update(events, dt)
         nBoids.draw(screen)
-        pygame.display.update()
+        pg.display.update()
 
         dt = clock.tick(FPS)
 
@@ -122,4 +122,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-pygame.quit()
+pg.quit()
