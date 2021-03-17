@@ -5,10 +5,10 @@ from random import randint
 #  PyNBoids by Nik - WIP
 # This is an attempt to recreate the Boids simulation myself.
 
-BOIDZ = 80    # how many boids to spawn, may slow after 100-200ish
-WIDTH = 1200
-HEIGHT = 800
-FPS = 48      # 60 is fine too
+BOIDZ = 100    # how many boids to spawn, may slow after 100-200ish
+WIDTH = 1200   # 1200
+HEIGHT = 800   # 800
+FPS = 60       # 48-60 looks good
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
@@ -16,7 +16,7 @@ class Boid(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface((16, 16))
         self.image.set_colorkey((0, 0, 0)) # self.image.fill((0, 0, 0))
-        randcolor = (randint(64,164),randint(64,164),randint(64,164))
+        randcolor = (randint(64,200),randint(64,200),randint(64,200))
         pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
         self.direction = (1, 0) # pygame.Vector2(0, -1)
@@ -27,8 +27,11 @@ class Boid(pg.sprite.Sprite):
 
     def update(self, events, dt): # Most boid behavior done in here
         # checks all other boids to see who's nearby, and manages a list of neighbors
-        neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
-        neiboids.remove(self)  # neiboids = [] # might be needed b4 these
+        neiboids = [ iBoid
+            for iBoid in self.groups()[0].sprites()
+            if pg.Vector2(iBoid.rect.center).distance_to(self.rect.center) < 128 and iBoid != self ]
+        #neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
+        #neiboids.remove(self) # this method was SLOW
         # sort the neighbors by their distance to self.. seems to work
         neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
         del neiboids[7:]  # keep 7 closest, dump the rest
@@ -56,8 +59,13 @@ class Boid(pg.sprite.Sprite):
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             # if boid gets too close to targets, steer away
             if tDistance < 12 : angleDiff = -angleDiff
+            # steers based on angleDiff
             if angleDiff < 0 : self.angle += 2
-            elif angleDiff > 0 : self.angle -= 2
+            elif angleDiff > 0 : self.angle -= 2 # still probably faster than these alternaties
+            #self.angle -= angleDiff and 2 * abs(angleDiff) / angleDiff
+            #if angleDiff!=0 : self.angle -= copysign(2,angleDiff)
+            #self.angle += 2 if angleDiff < 0 else -2 if angleDiff > 0 else 0
+            # ensures that the angle stays within 0-360
             self.angle %= 360
 
         # adjusts angle of boid image to match heading
@@ -106,7 +114,7 @@ def main():
         dt = clock.tick(FPS)
         # quick debug to see fps in terminal
         fpsChecker+=1
-        if fpsChecker>FPS:
+        if fpsChecker>=FPS:
             print(round(clock.get_fps(),2))
             fpsChecker=0
 
