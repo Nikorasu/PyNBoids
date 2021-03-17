@@ -2,13 +2,13 @@ import pygame
 from math import sin, cos, atan2, radians, degrees
 from random import randint
 
-# Made by Nik
+#  by Nik
 # This is an attempt to recreate the biods simulation myself.
 
-BOIDZ = 80 # how many boids to spawn, slow after 100-200ish
+BOIDZ = 80    # how many boids to spawn, slow after 100-200ish
 WIDTH = 1200
 HEIGHT = 800
-FPS = 48
+FPS = 48      # 60 is fine too
 
 # this class handles the individual boids
 class Boid(pygame.sprite.Sprite):
@@ -16,17 +16,17 @@ class Boid(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.Surface((16, 16))
         self.image.set_colorkey((0, 0, 0)) # self.image.fill((0, 0, 0))
-        randcolor = randint(50,200),randint(50,200),randint(50,200)
-        pygame.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14))) # pygame.Color(
+        randcolor = (randint(50,200),randint(50,200),randint(50,200))
+        pygame.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
         self.direction = (1, 0) # pygame.Vector2(0, -1)
         w, h = pygame.display.get_surface().get_size()
-        self.rect = self.image.get_rect(center=(randint(0,w), randint(0,h))) #.get_rect(center=(w/2, h/2))
+        self.rect = self.image.get_rect(center=(randint(0,w), randint(0,h)))
         self.angle = randint(0,360)
         self.pos = pygame.Vector2(self.rect.center)
 
-    def update(self, events, dt): # pretty much all their logic is in here
-        # this bit checks all other boids to see who's nearby, and manages a list of neighbors
+    def update(self, events, dt): # Most boid behavior done in here
+        # checks all other boids to see who's nearby, and manages a list of neighbors
         #for iBoid in self.groups()[0].sprites():
         #    idist = pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(iBoid.rect.center))
         #    if (idist < 128) and (iBoid != self) and not iBoid in neiboids:
@@ -35,15 +35,15 @@ class Boid(pygame.sprite.Sprite):
         #        neiboids.remove(iBoid)
         neiboids = pygame.sprite.spritecollide(self, self.groups()[0].sprites(), False, pygame.sprite.collide_circle_ratio(8))
         neiboids.remove(self)  # neiboids = [] # might be needed b4 these
-        # ^ this alternative sometimes seems slower.. up to 1 fps slower, but other way crashes?
-        # sort the neighbors by their distance to self.. hopefully works
+        # ^ this alternative sometimes seems 1fps slower, but the other way randomly crashed?
+        # sort the neighbors by their distance to self.. seems to work
         neiboids.sort(key=lambda i: pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(i.rect.center)))
-        del neiboids[7:] # keep 7 closest, dump the rest
-        # next we get the averaged center coordinate for all neighbors, storing it as targetV
+        del neiboids[7:]  # keep 7 closest, dump the rest
+        # prep variables for averages
         xvt = yvt = yat = xat = 0
         ncount = len(neiboids)
-        if ncount > 0:
-            for nBoid in neiboids:
+        if ncount > 0:  # when boid has neighbors
+            for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
                 xvt += nBoid.rect.centerx
                 yvt += nBoid.rect.centery
                 yat += sin(radians(nBoid.angle))
@@ -51,9 +51,11 @@ class Boid(pygame.sprite.Sprite):
             # computes average angle and vector for neighbors
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
-            if pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(neiboids[0].rect.center)) < 12 : targetV = neiboids[0].rect.center
-            tDiff = targetV - pygame.Vector2(self.rect.center)
-            tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff) #[1] angle #[0] has distance
+            # if closest neighbor is too close, set it as target to avoid
+            if pygame.Vector2(self.rect.center).distance_to(pygame.Vector2(neiboids[0].rect.center)) < 12:
+                targetV = neiboids[0].rect.center
+            tDiff = targetV - pygame.Vector2(self.rect.center)  # get angle differences for steering
+            tDistance, tAngle = pygame.math.Vector2.as_polar(tDiff)  #[1] angle #[0] has distance
             # if boid is close enough to neighbors, match their average angle
             if tDistance < 64 : tAngle = tAvejAng
             # computes the difference to reach target angle, for smooth steering
@@ -69,7 +71,7 @@ class Boid(pygame.sprite.Sprite):
 
         # adjusts angle of boid image to match heading
         self.image = pygame.transform.rotate(self.org_image, -self.angle)
-        self.rect = self.image.get_rect(center=self.rect.center) # important fix
+        self.rect = self.image.get_rect(center=self.rect.center)  # centering fix
         # controls forward movement/speed
         self.direction = pygame.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * 142 * dt / 1000
