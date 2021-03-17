@@ -16,7 +16,7 @@ class Boid(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface((16, 16))
         self.image.set_colorkey((0, 0, 0)) # self.image.fill((0, 0, 0))
-        randcolor = (randint(50,200),randint(50,200),randint(50,200))
+        randcolor = (randint(64,164),randint(64,164),randint(64,164))
         pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
         self.direction = (1, 0) # pygame.Vector2(0, -1)
@@ -107,7 +107,7 @@ def main():
         # quick debug to see fps in terminal
         fpsChecker+=1
         if fpsChecker>FPS:
-            print(clock.get_fps())
+            print(round(clock.get_fps(),2))
             fpsChecker=0
 
 if __name__ == '__main__':
