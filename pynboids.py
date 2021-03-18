@@ -8,7 +8,7 @@ from random import randint
 BOIDZ = 100    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200   # 1200
 HEIGHT = 800   # 800
-FPS = 60       # 48-60 looks good
+FPS = 48       # 48-60 looks good
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
@@ -48,7 +48,7 @@ class Boid(pg.sprite.Sprite):
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
             # if closest neighbor is too close, set it as target to avoid
-            if pg.Vector2(self.rect.center).distance_to(pg.Vector2(neiboids[0].rect.center)) < 12:
+            if pg.Vector2(self.rect.center).distance_to(pg.Vector2(neiboids[0].rect.center)) < 16:
                 targetV = neiboids[0].rect.center
             tDiff = targetV - pg.Vector2(self.rect.center)  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)  #[1] angle #[0] has distance
@@ -58,7 +58,7 @@ class Boid(pg.sprite.Sprite):
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             # if boid gets too close to targets, steer away
-            if tDistance < 12 : angleDiff = -angleDiff
+            if tDistance < 16 and targetV == neiboids[0].rect.center : angleDiff = -angleDiff # and targetV == neiboids[0].rect.center
             # steers based on angleDiff
             if angleDiff < 0 : self.angle += 2
             elif angleDiff > 0 : self.angle -= 2
@@ -69,7 +69,7 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)  # centering fix
         # controls forward movement/speed
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * 142 * dt / 1000
+        next_pos = self.pos + self.direction * 200 * dt
         self.pos = next_pos
         # screen wrap
         window = pg.display.get_surface().get_rect()
@@ -93,23 +93,23 @@ def main():
         nBoids.add(Boid())
     # clock setup
     clock = pg.time.Clock()
-    fpsChecker = 0
+    #fpsChecker = 0
     # main loop
     while True:
         events = pg.event.get()
         for e in events:
             if e.type == pg.QUIT:
                 return
-        dt = clock.tick(FPS)
+        dt = clock.tick(FPS) / 1000
         screen.fill((10, 10, 10)) # background color
         nBoids.update(events, dt)
         nBoids.draw(screen)
         pg.display.update()
         # quick debug to see fps in terminal
-        fpsChecker+=1
-        if fpsChecker>=FPS:
-            print(round(clock.get_fps(),2))
-            fpsChecker=0
+        #fpsChecker+=1
+        #if fpsChecker>=FPS:
+        #    print(round(clock.get_fps(),2))
+        #    fpsChecker=0
 
 if __name__ == '__main__':
     main()
