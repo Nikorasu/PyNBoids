@@ -8,18 +8,19 @@ from random import randint
 BOIDZ = 100    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200   # 1200
 HEIGHT = 800   # 800
-FPS = 48       # 48-60 looks good
+FPS = 48       # 48 looks ok
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        # set up for boid
         self.image = pg.Surface((16, 16))
         self.image.set_colorkey((0, 0, 0)) # self.image.fill((0, 0, 0))
         randcolor = (randint(64,200),randint(64,200),randint(64,200))
         pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
-        self.direction = (1, 0) # pygame.Vector2(0, -1)
+        self.direction = pg.Vector2(1, 0)
         w, h = pg.display.get_surface().get_size()
         self.rect = self.image.get_rect(center=(randint(0,w), randint(0,h)))
         self.angle = randint(0,360)
@@ -58,7 +59,7 @@ class Boid(pg.sprite.Sprite):
             angleDiff = (self.angle - tAngle) + 180
             angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             # if boid gets too close to targets, steer away
-            if tDistance < 16 and targetV == neiboids[0].rect.center : angleDiff = -angleDiff # and targetV == neiboids[0].rect.center
+            if tDistance < 16 and targetV == neiboids[0].rect.center : angleDiff = -angleDiff
             # steers based on angleDiff
             if angleDiff < 0 : self.angle += 2
             elif angleDiff > 0 : self.angle -= 2
@@ -93,7 +94,6 @@ def main():
         nBoids.add(Boid())
     # clock setup
     clock = pg.time.Clock()
-    #fpsChecker = 0
     # main loop
     while True:
         events = pg.event.get()
@@ -105,9 +105,8 @@ def main():
         nBoids.update(events, dt)
         nBoids.draw(screen)
         pg.display.update()
-        # quick debug to see fps in terminal
-        #fpsChecker+=1
-        #if fpsChecker>=FPS:
+        #fpsChecker+=1  #fpsChecker = 0  # must go before main loop
+        #if fpsChecker>=FPS:  # quick debug to see fps in terminal
         #    print(round(clock.get_fps(),2))
         #    fpsChecker=0
 
