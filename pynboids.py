@@ -61,13 +61,9 @@ class Boid(pg.sprite.Sprite):
             if tDistance < 12 : angleDiff = -angleDiff
             # steers based on angleDiff
             if angleDiff < 0 : self.angle += 2
-            elif angleDiff > 0 : self.angle -= 2 # still probably faster than these alternaties
-            #self.angle -= angleDiff and 2 * abs(angleDiff) / angleDiff
-            #if angleDiff!=0 : self.angle -= copysign(2,angleDiff)
-            #self.angle += 2 if angleDiff < 0 else -2 if angleDiff > 0 else 0
+            elif angleDiff > 0 : self.angle -= 2
             # ensures that the angle stays within 0-360
             self.angle %= 360
-
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # centering fix
@@ -75,7 +71,6 @@ class Boid(pg.sprite.Sprite):
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * 142 * dt / 1000
         self.pos = next_pos
-
         # screen wrap
         window = pg.display.get_surface().get_rect()
         if not window.contains(self.rect):
@@ -96,22 +91,20 @@ def main():
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
         nBoids.add(Boid())
-
+    # clock setup
     clock = pg.time.Clock()
-    fpsChecker = dt = 0
+    fpsChecker = 0
     # main loop
     while True:
         events = pg.event.get()
         for e in events:
             if e.type == pg.QUIT:
                 return
-
-        screen.fill((10, 10, 10))
+        dt = clock.tick(FPS)
+        screen.fill((10, 10, 10)) # background color
         nBoids.update(events, dt)
         nBoids.draw(screen)
         pg.display.update()
-
-        dt = clock.tick(FPS)
         # quick debug to see fps in terminal
         fpsChecker+=1
         if fpsChecker>=FPS:
