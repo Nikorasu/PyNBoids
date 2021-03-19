@@ -3,5 +3,8 @@
 
 This is my attempt at recreating the [Boids simulation](https://en.wikipedia.org/wiki/Boids "Wikipedia"), written in Python3 with Pygame2.
 
-Here's a sample of what it looks like:
+Preview:
+![Preview](preview.gif "Preview")
+
+Screenshot:
 ![Screenshot](screenshot1.png "Screenshot")
