@@ -6,5 +6,3 @@ This is my attempt at recreating the [Boids simulation](https://en.wikipedia.org
 Preview:
 ![Preview](preview.gif "Preview")
 
-Screenshot:
-![Screenshot](screenshot1.png "Screenshot")
