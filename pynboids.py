@@ -8,15 +8,14 @@ from random import randint
 BOIDZ = 100    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200   # 1200
 HEIGHT = 800   # 800
-FPS = 48       # 48 looks ok
+FPS = 48       # 30-90
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        # set up for boid
         self.image = pg.Surface((16, 16))
-        self.image.set_colorkey((0, 0, 0)) # self.image.fill((0, 0, 0))
+        self.image.set_colorkey((0, 0, 0))
         randcolor = (randint(64,200),randint(64,200),randint(64,200))
         pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
@@ -27,14 +26,11 @@ class Boid(pg.sprite.Sprite):
         self.pos = pg.Vector2(self.rect.center)
 
     def update(self, events, allBoids, dt): # Most boid behavior done in here
-        # checks all other boids to see who's nearby, and manages a list of neighbors
-        neiboids = sorted([
-            iBoid for iBoid in allBoids #self.groups()[0].sprites()
+        neiboids = sorted([  # gets list of nearby boids, sorted by distance
+            iBoid for iBoid in allBoids
             if pg.Vector2(iBoid.rect.center).distance_to(self.rect.center) < 128 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(pg.Vector2(self.rect.center)))
         #neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
-        #neiboids.remove(self) # this method was SLOW
-        # sort the neighbors by their distance to self.. seems to work
         #neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # prep variables for averages
