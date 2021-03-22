@@ -26,20 +26,21 @@ class Boid(pg.sprite.Sprite):
         self.angle = randint(0,360)
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, events, dt): # Most boid behavior done in here
+    def update(self, events, allBoids, dt): # Most boid behavior done in here
         # checks all other boids to see who's nearby, and manages a list of neighbors
-        neiboids = [ iBoid
-            for iBoid in self.groups()[0].sprites()
-            if pg.Vector2(iBoid.rect.center).distance_to(self.rect.center) < 128 and iBoid != self ]
+        neiboids = sorted([
+            iBoid for iBoid in allBoids #self.groups()[0].sprites()
+            if pg.Vector2(iBoid.rect.center).distance_to(self.rect.center) < 128 and iBoid != self ],
+            key=lambda i: pg.Vector2(i.rect.center).distance_to(pg.Vector2(self.rect.center)))
         #neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
         #neiboids.remove(self) # this method was SLOW
         # sort the neighbors by their distance to self.. seems to work
-        neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
+        #neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # prep variables for averages
         xvt = yvt = yat = xat = 0
-        ncount = len(neiboids)
-        if ncount > 0:  # when boid has neighbors
+        #ncount = len(neiboids) # replaced by walrus
+        if (ncount := len(neiboids)) > 0:  # when boid has neighbors
             for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
                 xvt += nBoid.rect.centerx
                 yvt += nBoid.rect.centery
@@ -61,10 +62,11 @@ class Boid(pg.sprite.Sprite):
             # if boid gets too close to targets, steer away
             if tDistance < 16 and targetV == neiboids[0].rect.center : angleDiff = -angleDiff
             # steers based on angleDiff
-            if angleDiff < 0 : self.angle += 2
-            elif angleDiff > 0 : self.angle -= 2
-            # ensures that the angle stays within 0-360
-            self.angle %= 360
+            #if angleDiff < 0 : self.angle += 2
+            #elif angleDiff > 0 : self.angle -= 2
+            if angleDiff != 0:
+                self.angle -= 2 * abs(angleDiff) / angleDiff
+                self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # centering fix
@@ -92,6 +94,7 @@ def main():
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
         nBoids.add(Boid())
+    allBoids = nBoids.sprites() #set() seems slower
     # clock setup
     clock = pg.time.Clock()
     # main loop
@@ -102,7 +105,7 @@ def main():
                 return
         dt = clock.tick(FPS) / 1000
         screen.fill((10, 10, 10)) # background color
-        nBoids.update(events, dt)
+        nBoids.update(events, allBoids, dt)
         nBoids.draw(screen)
         pg.display.update()
         #fpsChecker+=1  #fpsChecker = 0  # must go before main loop
