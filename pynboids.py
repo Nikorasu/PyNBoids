@@ -25,15 +25,17 @@ class Boid(pg.sprite.Sprite):
         self.pos = pg.Vector2(self.rect.center)
 
     def update(self, allBoids, dt): # Most boid behavior done in here  # events,
+        selfCenter = pg.Vector2(self.rect.center)
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
-            if pg.Vector2(iBoid.rect.center).distance_to(self.rect.center) < 128 and iBoid != self ],
-            key=lambda i: pg.Vector2(i.rect.center).distance_to(pg.Vector2(self.rect.center)))
+            if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 128 and iBoid != self ],
+            key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # prep variables for averages
         xvt = yvt = yat = xat = 0
         #ncount = len(neiboids) # replaced by walrus
         if (ncount := len(neiboids)) > 0:  # when boid has neighbors
+            nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
                 xvt += nBoid.rect.centerx
                 yvt += nBoid.rect.centery
@@ -43,20 +45,20 @@ class Boid(pg.sprite.Sprite):
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
             # if closest neighbor is too close, set it as target to avoid
-            if pg.Vector2(self.rect.center).distance_to(pg.Vector2(neiboids[0].rect.center)) < 16:
-                targetV = neiboids[0].rect.center
-            tDiff = targetV - pg.Vector2(self.rect.center)  # get angle differences for steering
+            if selfCenter.distance_to(nearestBoid) < 16:
+                targetV = nearestBoid
+            tDiff = targetV - selfCenter  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)  #[1] angle #[0] has distance
             # if boid is close enough to neighbors, match their average angle
             if tDistance < 64 : tAngle = tAvejAng
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (self.angle - tAngle) + 180
-            angleDiff = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
+            turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             # if boid gets too close to targets, steer away
-            if tDistance < 16 and targetV == neiboids[0].rect.center : angleDiff = -angleDiff
-            # steers based on angleDiff
-            if angleDiff != 0:
-                self.angle -= 2 * abs(angleDiff) / angleDiff
+            if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
+            # steers based on turnDir
+            if turnDir != 0:
+                self.angle -= 2 * abs(turnDir) / turnDir
                 self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
