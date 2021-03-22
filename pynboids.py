@@ -2,8 +2,7 @@ import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
 
-#  PyNBoids by Nik - WIP
-# This is an attempt to recreate the Boids simulation myself.
+#  PyNBoids by Nik - a Boids simulation
 
 BOIDZ = 100    # how many boids to spawn, may slow after 100-200ish
 WIDTH = 1200   # 1200
@@ -25,13 +24,11 @@ class Boid(pg.sprite.Sprite):
         self.angle = randint(0,360)
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, events, allBoids, dt): # Most boid behavior done in here
+    def update(self, allBoids, dt): # Most boid behavior done in here  # events,
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
             if pg.Vector2(iBoid.rect.center).distance_to(self.rect.center) < 128 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(pg.Vector2(self.rect.center)))
-        #neiboids = pg.sprite.spritecollide(self, self.groups()[0].sprites(), False, pg.sprite.collide_circle_ratio(8))
-        #neiboids.sort(key=lambda i: pg.Vector2(self.rect.center).distance_to(pg.Vector2(i.rect.center)))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # prep variables for averages
         xvt = yvt = yat = xat = 0
@@ -58,8 +55,6 @@ class Boid(pg.sprite.Sprite):
             # if boid gets too close to targets, steer away
             if tDistance < 16 and targetV == neiboids[0].rect.center : angleDiff = -angleDiff
             # steers based on angleDiff
-            #if angleDiff < 0 : self.angle += 2
-            #elif angleDiff > 0 : self.angle -= 2
             if angleDiff != 0:
                 self.angle -= 2 * abs(angleDiff) / angleDiff
                 self.angle %= 360  # ensures that the angle stays within 0-360
@@ -101,15 +96,10 @@ def main():
                 return
         dt = clock.tick(FPS) / 1000
         screen.fill((10, 10, 10)) # background color
-        nBoids.update(events, allBoids, dt)
+        nBoids.update(allBoids, dt)  # events,
         nBoids.draw(screen)
         pg.display.update()
-        #fpsChecker+=1  #fpsChecker = 0  # must go before main loop
-        #if fpsChecker>=FPS:  # quick debug to see fps in terminal
-        #    print(round(clock.get_fps(),2))
-        #    fpsChecker=0
 
 if __name__ == '__main__':
-    main()
-# by Nik
-pg.quit()
+    main()  # by Nik
+    pg.quit()
