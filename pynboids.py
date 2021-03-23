@@ -58,7 +58,7 @@ class Boid(pg.sprite.Sprite):
             if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
             # steers based on turnDir
             if turnDir != 0:
-                self.angle -= 2 * abs(turnDir) / turnDir
+                self.angle -= 3 * abs(turnDir) / turnDir
                 self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
