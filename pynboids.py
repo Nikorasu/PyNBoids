@@ -62,7 +62,7 @@ class Boid(pg.sprite.Sprite):
         turnRate = 3
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
-        if min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin and not WRAP:
+        if not WRAP and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
             if self.pos.x < margin:
                 tAngle = 0
             elif self.pos.x > curW - margin:
@@ -73,8 +73,8 @@ class Boid(pg.sprite.Sprite):
                 tAngle = 270
             angleDiff = (self.angle - tAngle) + 180
             turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
-            edgeDist = min(self.pos.x, curW - self.pos.x, self.pos.y, curH - self.pos.y)
-            turnRate = 3 + (1 - edgeDist / 100) * (20 - 3) #minRate+(1-dist/margin)*(maxRate-minRate)
+            edgeDist = min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y)
+            turnRate = 3 + (1 - edgeDist / margin) * (20 - 3) #minRate+(1-dist/margin)*(maxRate-minRate)
         # steers based on turnDir
         if turnDir != 0:
             self.angle -= turnRate * abs(turnDir) / turnDir
