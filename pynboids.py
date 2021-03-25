@@ -30,7 +30,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
-            if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 128 and iBoid != self ],
+            if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 200 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # prep variables for averages
@@ -58,7 +58,7 @@ class Boid(pg.sprite.Sprite):
             turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             # if boid gets too close to targets, steer away
             if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
-        margin = 64
+        margin = 50
         turnRate = 3
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
