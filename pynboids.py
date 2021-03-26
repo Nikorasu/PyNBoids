@@ -63,14 +63,10 @@ class Boid(pg.sprite.Sprite):
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
         if not WRAP and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
-            if self.pos.x < margin:
-                tAngle = 0
-            elif self.pos.x > curW - margin:
-                tAngle = 180
-            if self.pos.y < margin:
-                tAngle = 90
-            elif self.pos.y > curH - margin:
-                tAngle = 270
+            if self.pos.x < margin : tAngle = 0  # may also need 45,135,225,315 for corners
+            elif self.pos.x > curW - margin : tAngle = 180
+            if self.pos.y < margin : tAngle = 90
+            elif self.pos.y > curH - margin : tAngle = 270
             angleDiff = (self.angle - tAngle) + 180
             turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             edgeDist = min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y)
@@ -81,7 +77,7 @@ class Boid(pg.sprite.Sprite):
             self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
-        self.rect = self.image.get_rect(center=self.rect.center)  # centering fix
+        self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         # controls forward movement/speed
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * 200 * dt
@@ -105,7 +101,7 @@ def main():
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
         nBoids.add(Boid())
-    allBoids = nBoids.sprites() #set() seems slower
+    allBoids = nBoids.sprites()
     # clock setup
     clock = pg.time.Clock()
     # main loop
