@@ -89,9 +89,9 @@ class Boid(pg.sprite.Sprite):
         # screen wrap
         if WRAP and not self.window.get_rect().contains(self.rect):
             if self.rect.bottom < 0 : self.pos.y = curH
-            if self.rect.top > curH : self.pos.y = 0
+            elif self.rect.top > curH : self.pos.y = 0
             if self.rect.right < 0 : self.pos.x = curW
-            if self.rect.left > curW : self.pos.x = 0
+            elif self.rect.left > curW : self.pos.x = 0
         # Actually update position of boid
         self.rect.center = self.pos
 
@@ -112,7 +112,7 @@ def main():
     while True:
         events = pg.event.get()
         for e in events:
-            if e.type == pg.QUIT:
+            if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 return
         dt = clock.tick(FPS) / 1000
         screen.fill((10, 10, 10)) # background color
