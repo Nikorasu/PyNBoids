@@ -26,17 +26,16 @@ class Boid(pg.sprite.Sprite):
         self.angle = randint(0,360)
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, allBoids, dt): # Most boid behavior done in here  # events,
+    def update(self, allBoids, dt): # Most boid behavior done in here
         selfCenter = pg.Vector2(self.rect.center)
+        turnDir = xvt = yvt = yat = xat = 0
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
             if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 200 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
-        # prep variables for averages
-        turnDir = xvt = yvt = yat = xat = 0
         #ncount = len(neiboids) # replaced by walrus
-        if (ncount := len(neiboids)) > 1:  # when boid has neighbors
+        if (ncount := len(neiboids)) > 1:  # when boid has neighborS
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
                 xvt += nBoid.rect.centerx
@@ -63,7 +62,7 @@ class Boid(pg.sprite.Sprite):
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
         if not WRAP and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
-            if self.pos.x < margin : tAngle = 0  # may also need 45,135,225,315 for corners
+            if self.pos.x < margin : tAngle = 0
             elif self.pos.x > curW - margin : tAngle = 180
             if self.pos.y < margin : tAngle = 90
             elif self.pos.y > curH - margin : tAngle = 270
@@ -112,7 +111,7 @@ def main():
                 return
         dt = clock.tick(FPS) / 1000
         screen.fill((10, 10, 10)) # background color
-        nBoids.update(allBoids, dt)  # events,
+        nBoids.update(allBoids, dt)
         nBoids.draw(screen)
         pg.display.update()
 
