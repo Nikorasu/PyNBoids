@@ -4,7 +4,7 @@ from random import randint
 
 #  PyNBoids by Nik - a Boids simulation
 
-FULLSCREEN = True   # Fullscreen or Window
+FULLSCREEN = False   # Fullscreen or Window
 BOIDZ = 100         # how many boids to spawn, may slow after 100-200ish
 WRAP = False        # wrap boids to other side of screen, otherwise avoid edge.
 WIDTH = 1200        # 1200
@@ -15,7 +15,7 @@ FPS = 48            # 30-90
 class Boid(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.Surface((16, 16))
+        self.image = pg.Surface((16, 16))  # setting up boid image
         self.image.set_colorkey((0, 0, 0))
         randcolor = (randint(64,200),randint(64,200),randint(64,200))
         pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
@@ -97,9 +97,9 @@ def main():
     except: print("FYI: nboids.png icon not found, skipping..")
     if FULLSCREEN:
         screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
+        pg.mouse.set_visible(False)
         pg.display.toggle_fullscreen()  # linux workaround
         pg.display.toggle_fullscreen()
-        pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
     # spawns desired number of boids
     nBoids = pg.sprite.Group()
@@ -115,7 +115,7 @@ def main():
             if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 return
         dt = clock.tick(FPS) / 1000
-        screen.fill((10, 10, 10)) # background color
+        screen.fill((0, 0, 0))  # background color
         nBoids.update(allBoids, dt)
         nBoids.draw(screen)
         pg.display.update()
