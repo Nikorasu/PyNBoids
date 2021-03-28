@@ -4,11 +4,12 @@ from random import randint
 
 #  PyNBoids by Nik - a Boids simulation
 
-BOIDZ = 100    # how many boids to spawn, may slow after 100-200ish
-WIDTH = 1200   # 1200
-HEIGHT = 800   # 800
-FPS = 48       # 30-90
-WRAP = False    # wrap boids to other side of screen, otherwise avoid edge.
+FULLSCREEN = True   # Fullscreen or Window
+BOIDZ = 100         # how many boids to spawn, may slow after 100-200ish
+WRAP = False        # wrap boids to other side of screen, otherwise avoid edge.
+WIDTH = 1200        # 1200
+HEIGHT = 800        # 800
+FPS = 48            # 30-90
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
@@ -22,11 +23,11 @@ class Boid(pg.sprite.Sprite):
         self.direction = pg.Vector2(1, 0)
         self.window = pg.display.get_surface()
         w, h = self.window.get_size()
-        self.rect = self.image.get_rect(center=(randint(0,w), randint(0,h)))
+        self.rect = self.image.get_rect(center=(randint(50,w-50), randint(50,h-50)))
         self.angle = randint(0,360)
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, allBoids, dt): # Most boid behavior done in here
+    def update(self, allBoids, dt): # Most boid behavior/logic done in here
         selfCenter = pg.Vector2(self.rect.center)
         turnDir = xvt = yvt = yat = xat = 0
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
@@ -46,10 +47,9 @@ class Boid(pg.sprite.Sprite):
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
             # if closest neighbor is too close, set it as target to avoid
-            if selfCenter.distance_to(nearestBoid) < 16:
-                targetV = nearestBoid
+            if selfCenter.distance_to(nearestBoid) < 16 : targetV = nearestBoid
             tDiff = targetV - selfCenter  # get angle differences for steering
-            tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)  #[1] angle #[0] has distance
+            tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
             if tDistance < 64 : tAngle = tAvejAng
             # computes the difference to reach target angle, for smooth steering
@@ -95,7 +95,12 @@ def main():
     pg.display.set_caption("PyNBoids")
     try: pg.display.set_icon(pg.image.load("nboids.png"))
     except: print("FYI: nboids.png icon not found, skipping..")
-    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
+    if FULLSCREEN:
+        screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
+        pg.display.toggle_fullscreen()  # linux workaround
+        pg.display.toggle_fullscreen()
+        pg.mouse.set_visible(False)
+    else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
     # spawns desired number of boids
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
