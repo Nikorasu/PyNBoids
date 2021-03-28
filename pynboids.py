@@ -3,9 +3,9 @@ from math import sin, cos, atan2, radians, degrees
 from random import randint
 
 #  PyNBoids by Nik - a Boids simulation
-FULLSCREEN = False  # Fullscreen or Window
-BOIDZ = 100         # how many boids to spawn, may slow after 100-200ish
-WRAP = False        # wrap boids to other side of screen, otherwise avoid edge.
+FULLSCREEN = False  # True for Fullscreen or False for Window
+BOIDZ = 100         # How many boids to spawn, may slow after 100-200ish.
+WRAP = False        # Wrap boids to other side of screen, otherwise avoid edge.
 WIDTH = 1200        # 1200
 HEIGHT = 800        # 800
 FPS = 48            # 30-90
@@ -94,7 +94,8 @@ def main():
     pg.display.set_caption("PyNBoids")
     try: pg.display.set_icon(pg.image.load("nboids.png"))
     except: print("FYI: nboids.png icon not found, skipping..")
-    if FULLSCREEN:  # screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
+    if FULLSCREEN:
+        #screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
         screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
         pg.display.toggle_fullscreen()  # linux workaround
