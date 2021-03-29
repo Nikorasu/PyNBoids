@@ -16,7 +16,7 @@ class Boid(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface((16, 16))  # setting up boid image
         self.image.set_colorkey((0, 0, 0))
-        randcolor = (randint(64,200),randint(64,200),randint(64,200))
+        randcolor = (randint(55,200),randint(55,200),randint(55,200))
         pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
         self.org_image = self.image.copy()
         self.direction = pg.Vector2(1, 0)
