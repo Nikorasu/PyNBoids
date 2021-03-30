@@ -1,5 +1,5 @@
 # PyNBoids
-### A recreation of the Boids simulation
+### A Python Boids Simulation
 
 This is a [Boids simulation](https://en.wikipedia.org/wiki/Boids "Wikipedia"), written in Python3 with Pygame2.
 
