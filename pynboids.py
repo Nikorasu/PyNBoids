@@ -5,6 +5,7 @@ from random import randint
 #  PyNBoids by Nik - a Boids simulation
 FLLSCRN = False    # True for Fullscreen or False for Window
 BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
+FISH = False       # True will make Boids into Fish. Not yet implemented.
 WRAP = False       # Wrap boids to other side of screen, otherwise avoid edge.
 WIDTH = 1200       # 1200
 HEIGHT = 800       # 800
@@ -14,11 +15,14 @@ FPS = 48           # 30-90
 class Boid(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.Surface((16, 16))  # setting up boid image
+        self.image = pg.Surface((15, 15))  # setting up boid image
         self.image.set_colorkey((0, 0, 0))
         randcolor = (randint(55,200),randint(55,200),randint(55,200))
-        pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14)))
-        self.org_image = self.image.copy()
+        #pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2) # fish
+        pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)),width=0) # boidarrow
+        #pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14))) #old
+        #self.org_image = self.image.copy() #old
+        self.org_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)
         self.window = pg.display.get_surface()
         w, h = self.window.get_size()
@@ -57,7 +61,7 @@ class Boid(pg.sprite.Sprite):
             # if boid gets too close to targets, steer away
             if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
         margin = 50
-        turnRate = 3
+        turnRate = 1.7 * (dt * 100)
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
         if not WRAP and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
@@ -68,7 +72,7 @@ class Boid(pg.sprite.Sprite):
             angleDiff = (self.angle - tAngle) + 180
             turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
             edgeDist = min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y)
-            turnRate = 3 + (1 - edgeDist / margin) * (20 - 3) #minRate+(1-dist/margin)*(maxRate-minRate)
+            turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #minRate+(1-dist/margin)*(maxRate-minRate)
         # steers based on turnDir
         if turnDir != 0:
             self.angle -= turnRate * abs(turnDir) / turnDir
