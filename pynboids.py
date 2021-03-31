@@ -3,7 +3,7 @@ from math import sin, cos, atan2, radians, degrees
 from random import randint
 
 #  PyNBoids by Nik - a Boids simulation
-FLLSCRN = True     # True for Fullscreen, or False for Window.
+FLLSCRN = False    # True for Fullscreen, or False for Window.
 BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
 WRAP = False       # False avoids edges, True wraps boids to other side.
 FISH = False       # True here will turn boids into fish.
@@ -12,8 +12,8 @@ WIDTH = 1200       # default 1200
 HEIGHT = 800       # default 800
 FPS = 48           # 30-90
 
-# this class handles the individual boids
 class Boid(pg.sprite.Sprite):
+    """ Initializes individual Boids, then handles their behavioral logic. """
     def __init__(self, isFish=False):
         super().__init__()
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
