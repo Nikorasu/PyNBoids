@@ -18,11 +18,10 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.Surface((15, 15))  # setting up boid image
         self.image.set_colorkey((0, 0, 0))
         randcolor = (randint(55,200),randint(55,200),randint(55,200))
-        #pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2) # fish
-        pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)),width=0) # boidarrow
+        if FISH : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
+        else : pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         #pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14))) #old
-        #self.org_image = self.image.copy() #old
-        self.org_image = pg.transform.rotate(self.image.copy(), -90)
+        self.org_image = pg.transform.rotate(self.image.copy(), -90) #self.org_image = self.image.copy()
         self.direction = pg.Vector2(1, 0)
         self.window = pg.display.get_surface()
         w, h = self.window.get_size()
