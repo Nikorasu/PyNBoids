@@ -6,27 +6,27 @@ from random import randint
 FLLSCRN = False    # True for Fullscreen or False for Window
 BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
 FISH = False       # True will make Boids into Fish.
-WRAP = False       # Wrap boids to other side of screen, otherwise avoid edge.
-BGCOLOR = (0,0,0)  # Background color
-WIDTH = 1200       # 1200
-HEIGHT = 800       # 800
+WRAP = False       # Wrap boids to other side of screen, False avoids edges.
+BGCOLOR = (0,0,0)  # Background color in RGB
+WIDTH = 1200       # default 1200
+HEIGHT = 800       # default 800
 FPS = 48           # 30-90
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.Surface((15, 15))  # setting up boid image
-        self.image.set_colorkey((0, 0, 0))
-        randcolor = (randint(55,200),randint(55,200),randint(55,200))
+        self.image = pg.Surface((15, 15))  # surface to draw boid image on
+        self.image.set_colorkey((0, 0, 0))  # defines black as transparent
+        randcolor = (randint(55,200),randint(55,200),randint(55,200)) # pick random color for each boid
         if FISH : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
         else : pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
-        self.direction = pg.Vector2(1, 0)
+        self.direction = pg.Vector2(1, 0)  # sets up forward directional vector
         self.window = pg.display.get_surface()
         w, h = self.window.get_size()
         self.rect = self.image.get_rect(center=(randint(50,w-50), randint(50,h-50)))
-        self.angle = randint(0,360)
+        self.angle = randint(0,360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
     def update(self, allBoids, dt): # Most boid behavior/logic done in here
@@ -37,8 +37,7 @@ class Boid(pg.sprite.Sprite):
             if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 200 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
-        #ncount = len(neiboids) # replaced by walrus
-        if (ncount := len(neiboids)) > 1:  # when boid has neighborS
+        if (ncount := len(neiboids)) > 1:  # when boid has neighborS (also 'walrus' sets ncount)
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
                 xvt += nBoid.rect.centerx
@@ -73,7 +72,7 @@ class Boid(pg.sprite.Sprite):
             edgeDist = min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y)
             turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #minRate+(1-dist/margin)*(maxRate-minRate)
         # steers based on turnDir
-        if turnDir != 0:
+        if turnDir != 0:  # handles left and right at the same time
             self.angle -= turnRate * abs(turnDir) / turnDir
             self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
@@ -97,8 +96,8 @@ def main():
     pg.display.set_caption("PyNBoids")
     try: pg.display.set_icon(pg.image.load("nboids.png"))
     except: print("FYI: nboids.png icon not found, skipping..")
-    if FLLSCRN:
-        #screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
+    # Setup fullscreen or window mode
+    if FLLSCRN:  #screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
         screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
         pg.display.toggle_fullscreen()  # linux workaround
@@ -118,7 +117,7 @@ def main():
             if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 return
         dt = clock.tick(FPS) / 1000
-        screen.fill(BGCOLOR)  # background color
+        screen.fill(BGCOLOR)
         nBoids.update(allBoids, dt)
         nBoids.draw(screen)
         pg.display.update()
