@@ -5,7 +5,7 @@ from random import randint
 #  PyNBoids by Nik - a Boids simulation
 FLLSCRN = False    # True for Fullscreen or False for Window
 BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
-FISH = False       # True will make Boids into Fish. Not yet implemented.
+FISH = False       # True will make Boids into Fish.
 WRAP = False       # Wrap boids to other side of screen, otherwise avoid edge.
 WIDTH = 1200       # 1200
 HEIGHT = 800       # 800
@@ -20,8 +20,7 @@ class Boid(pg.sprite.Sprite):
         randcolor = (randint(55,200),randint(55,200),randint(55,200))
         if FISH : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
         else : pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
-        #pg.draw.polygon(self.image, randcolor, ((0, 2), (16, 8), (0, 14))) #old
-        self.org_image = pg.transform.rotate(self.image.copy(), -90) #self.org_image = self.image.copy()
+        self.org_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)
         self.window = pg.display.get_surface()
         w, h = self.window.get_size()
