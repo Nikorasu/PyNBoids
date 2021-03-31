@@ -3,23 +3,23 @@ from math import sin, cos, atan2, radians, degrees
 from random import randint
 
 #  PyNBoids by Nik - a Boids simulation
-FLLSCRN = False    # True for Fullscreen or False for Window
+FLLSCRN = True     # True for Fullscreen, or False for Window.
 BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
-FISH = False       # True will make Boids into Fish.
-WRAP = False       # Wrap boids to other side of screen, False avoids edges.
-BGCOLOR = (0,0,0)  # Background color in RGB
+WRAP = False       # False avoids edges, True wraps boids to other side.
+FISH = False       # True here will turn boids into fish.
+BGCOLOR = (0,0,0)  # Background color in RGB.
 WIDTH = 1200       # default 1200
 HEIGHT = 800       # default 800
 FPS = 48           # 30-90
 
 # this class handles the individual boids
 class Boid(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, isFish=False):
         super().__init__()
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
         self.image.set_colorkey((0, 0, 0))  # defines black as transparent
         randcolor = (randint(55,200),randint(55,200),randint(55,200)) # pick random color for each boid
-        if FISH : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
+        if isFish : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
         else : pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)  # sets up forward directional vector
@@ -29,7 +29,7 @@ class Boid(pg.sprite.Sprite):
         self.angle = randint(0,360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, allBoids, dt): # Most boid behavior/logic done in here
+    def update(self, allBoids, dt, ejWrap=False): # most boid behavior/logic done in here
         selfCenter = pg.Vector2(self.rect.center)
         turnDir = xvt = yvt = yat = xat = 0
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
@@ -62,7 +62,7 @@ class Boid(pg.sprite.Sprite):
         turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
-        if not WRAP and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
+        if not ejWrap and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
             if self.pos.x < margin : tAngle = 0
             elif self.pos.x > curW - margin : tAngle = 180
             if self.pos.y < margin : tAngle = 90
@@ -83,12 +83,12 @@ class Boid(pg.sprite.Sprite):
         next_pos = self.pos + self.direction * 200 * dt  # 200 is movement speed
         self.pos = next_pos
         # screen wrap
-        if WRAP and not self.window.get_rect().contains(self.rect):
+        if ejWrap and not self.window.get_rect().contains(self.rect):
             if self.rect.bottom < 0 : self.pos.y = curH
             elif self.rect.top > curH : self.pos.y = 0
             if self.rect.right < 0 : self.pos.x = curW
             elif self.rect.left > curW : self.pos.x = 0
-        # Actually update position of boid
+        # actually update position of boid
         self.rect.center = self.pos
 
 def main():
@@ -96,7 +96,7 @@ def main():
     pg.display.set_caption("PyNBoids")
     try: pg.display.set_icon(pg.image.load("nboids.png"))
     except: print("FYI: nboids.png icon not found, skipping..")
-    # Setup fullscreen or window mode
+    # setup fullscreen or window mode
     if FLLSCRN:  #screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
         screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
@@ -106,7 +106,7 @@ def main():
     # spawns desired number of boids
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
-        nBoids.add(Boid())
+        nBoids.add(Boid(FISH))
     allBoids = nBoids.sprites()
     # clock setup
     clock = pg.time.Clock()
@@ -118,7 +118,7 @@ def main():
                 return
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
-        nBoids.update(allBoids, dt)
+        nBoids.update(allBoids, dt, WRAP)
         nBoids.draw(screen)
         pg.display.update()
 
