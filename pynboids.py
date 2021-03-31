@@ -7,6 +7,7 @@ FLLSCRN = False    # True for Fullscreen or False for Window
 BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
 FISH = False       # True will make Boids into Fish.
 WRAP = False       # Wrap boids to other side of screen, otherwise avoid edge.
+BGCOLOR = (0,0,0)  # Background color
 WIDTH = 1200       # 1200
 HEIGHT = 800       # 800
 FPS = 48           # 30-90
@@ -59,7 +60,7 @@ class Boid(pg.sprite.Sprite):
             # if boid gets too close to targets, steer away
             if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
         margin = 50
-        turnRate = 1.7 * (dt * 100)
+        turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
         curW, curH = self.window.get_size()
         # Avoids edges of screen by turning toward their surface-normal
         if not WRAP and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
@@ -80,7 +81,7 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         # controls forward movement/speed
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * 200 * dt
+        next_pos = self.pos + self.direction * 200 * dt  # 200 is movement speed
         self.pos = next_pos
         # screen wrap
         if WRAP and not self.window.get_rect().contains(self.rect):
@@ -117,7 +118,7 @@ def main():
             if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 return
         dt = clock.tick(FPS) / 1000
-        screen.fill((0, 0, 0))  # background color
+        screen.fill(BGCOLOR)  # background color
         nBoids.update(allBoids, dt)
         nBoids.draw(screen)
         pg.display.update()
