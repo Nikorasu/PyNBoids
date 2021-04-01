@@ -2,18 +2,18 @@ import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
 
-#  PyNBoids by Nik - a Boids simulation
-FLLSCRN = False    # True for Fullscreen, or False for Window.
-BOIDZ = 100        # How many boids to spawn, may slow after 100-200ish.
-WRAP = False       # False avoids edges, True wraps boids to other side.
-FISH = False       # True here will turn boids into fish.
-BGCOLOR = (0,0,0)  # Background color in RGB.
-WIDTH = 1200       # default 1200
-HEIGHT = 800       # default 800
-FPS = 48           # 30-90
+#   PyNBoids - a Boids simulation - by Nik - github.com/Nikorasu/PyNBoids
+FLLSCRN = False        # True for Fullscreen, or False for Window.
+BOIDZ = 100            # How many boids to spawn, may slow after 100-200ish.
+WRAP = False           # False avoids edges, True wraps boids to other side.
+FISH = False           # True here will turn boids into fish.
+BGCOLOR = (0,0,0)      # Background color in RGB.
+WIDTH = 1200           # default 1200
+HEIGHT = 800           # default 800
+FPS = 48               # 30-90
 
 class Boid(pg.sprite.Sprite):
-    """ Initializes individual Boids, then handles their behavioral logic. """
+    """ Spawns individual Boids, handles their behavioral logic. """
     def __init__(self, isFish=False):
         super().__init__()
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
@@ -37,7 +37,7 @@ class Boid(pg.sprite.Sprite):
             if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 200 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
-        if (ncount := len(neiboids)) > 1:  # when boid has neighborS (also 'walrus' sets ncount)
+        if (ncount := len(neiboids)) > 1:  # when boid has neighborS (also walrus sets ncount)
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
                 xvt += nBoid.rect.centerx
@@ -80,7 +80,7 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         # controls forward movement/speed
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * 200 * dt  # 200 is movement speed
+        next_pos = self.pos + self.direction * 200 * dt  # 200 is boid speed, 185 for fish?
         self.pos = next_pos
         # screen wrap
         if ejWrap and not self.window.get_rect().contains(self.rect):
@@ -123,5 +123,5 @@ def main():
         pg.display.update()
 
 if __name__ == '__main__':
-    main()  # by Nik
+    main()  # by Nik 2021
     pg.quit()
