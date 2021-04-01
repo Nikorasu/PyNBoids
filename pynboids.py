@@ -13,12 +13,12 @@ HEIGHT = 800           # default 800
 FPS = 48               # 30-90
 
 class Boid(pg.sprite.Sprite):
-    """ Spawns individual Boids, handles their behavioral logic. """
     def __init__(self, isFish=False):
         super().__init__()
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
         self.image.set_colorkey((0, 0, 0))  # defines black as transparent
-        randcolor = (randint(55,200),randint(55,200),randint(55,200)) # pick random color for each boid
+        randcolor = pg.Color(0,0,0)
+        randcolor.hsva = (randint(0,360),85,85)  # pick random color for each boid
         if isFish : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
         else : pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
