@@ -7,7 +7,7 @@ FLLSCRN = False        # True for Fullscreen, or False for Window.
 BOIDZ = 100            # How many boids to spawn, may slow after 100-200ish.
 WRAP = False           # False avoids edges, True wraps boids to other side.
 FISH = False           # True here will turn boids into fish.
-BGCOLOR = (0,0,0)      # Background color in RGB.
+BGCOLOR = (0, 0, 0)    # Background color in RGB.
 WIDTH = 1200           # default 1200
 HEIGHT = 800           # default 800
 FPS = 48               # 30-90
@@ -17,16 +17,16 @@ class Boid(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
         self.image.set_colorkey((0, 0, 0))  # defines black as transparent
-        randcolor = pg.Color(0,0,0)
-        randcolor.hsva = (randint(0,360),85,85)  # pick random color for each boid
-        if isFish : pg.draw.polygon(self.image, randcolor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)),width=2)
-        else : pg.draw.polygon(self.image, randcolor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
+        randColor = pg.Color(0, 0, 0)  # preps color variable
+        randColor.hsva = (randint(0, 360), 85, 85)  # pick random color for each boid
+        if isFish : pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=2)
+        else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)  # sets up forward directional vector
         self.window = pg.display.get_surface()
         w, h = self.window.get_size()
-        self.rect = self.image.get_rect(center=(randint(50,w-50), randint(50,h-50)))
-        self.angle = randint(0,360)  # random start angle, and position ^
+        self.rect = self.image.get_rect(center=(randint(50, w - 50), randint(50, h - 50)))
+        self.angle = randint(0, 360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
     def update(self, allBoids, dt, ejWrap=False): # most boid behavior/logic done in here
@@ -54,8 +54,8 @@ class Boid(pg.sprite.Sprite):
             # if boid is close enough to neighbors, match their average angle
             if tDistance < 64 : tAngle = tAvejAng
             # computes the difference to reach target angle, for smooth steering
-            angleDiff = (self.angle - tAngle) + 180
-            turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
+            angleDiff = (tAngle - self.angle) + 180
+            turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to targets, steer away
             if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
         margin = 50
@@ -67,13 +67,13 @@ class Boid(pg.sprite.Sprite):
             elif self.pos.x > curW - margin : tAngle = 180
             if self.pos.y < margin : tAngle = 90
             elif self.pos.y > curH - margin : tAngle = 270
-            angleDiff = (self.angle - tAngle) + 180
-            turnDir = ((angleDiff/360 - ( angleDiff//360 )) * 360.0) - 180
+            angleDiff = (tAngle - self.angle) + 180
+            turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             edgeDist = min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y)
             turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #minRate+(1-dist/margin)*(maxRate-minRate)
         # steers based on turnDir
         if turnDir != 0:  # handles left and right at the same time
-            self.angle -= turnRate * abs(turnDir) / turnDir
+            self.angle += turnRate * abs(turnDir) / turnDir
             self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
