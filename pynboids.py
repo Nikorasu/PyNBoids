@@ -1,17 +1,18 @@
-import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
-
-#   PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
-#   Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
-FLLSCRN = False        # True for Fullscreen, or False for Window.
-BOIDZ = 100            # How many boids to spawn, may slow after 100-200ish.
-WRAP = False           # False avoids edges, True wraps boids to other side.
-FISH = False           # True here will turn boids into fish.
-BGCOLOR = (0, 0, 0)    # Background color in RGB.
-WIDTH = 1200           # default 1200
-HEIGHT = 800           # default 800
-FPS = 48               # 30-90
+import pygame as pg
+'''
+PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
+Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
+'''
+FLLSCRN = False         # True for Fullscreen, or False for Window.
+BOIDZ = 100             # How many boids to spawn, may slow after 100-200ish.
+WRAP = False            # False avoids edges, True wraps boids to other side.
+FISH = False            # True here will turn boids into fish.
+BGCOLOR = (0, 0, 0)     # Background color in RGB.
+WIDTH = 1200            # default 1200
+HEIGHT = 800            # default 800
+FPS = 48                # 30-90
 
 class Boid(pg.sprite.Sprite):
     def __init__(self, isFish=False):
@@ -83,7 +84,7 @@ class Boid(pg.sprite.Sprite):
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * 200 * dt  # 200 is boid speed, 185 for fish?
         self.pos = next_pos
-        # screen wrap
+        # optional screen wrap
         if ejWrap and not self.window.get_rect().contains(self.rect):
             if self.rect.bottom < 0 : self.pos.y = curH
             elif self.rect.top > curH : self.pos.y = 0
@@ -109,7 +110,6 @@ def main():
     for n in range(BOIDZ):
         nBoids.add(Boid(FISH))
     allBoids = nBoids.sprites()
-    # clock setup
     clock = pg.time.Clock()
     # main loop
     while True:
