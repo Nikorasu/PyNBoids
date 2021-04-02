@@ -1,8 +1,9 @@
 import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
-#   PyNBoids - a Boids simulation - Copyright (c) 2021  Nikolaus Stromberg
-#       github.com/Nikorasu/PyNBoids        nikorasu85@gmail.com
+
+#   PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
+#   Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 FLLSCRN = False        # True for Fullscreen, or False for Window.
 BOIDZ = 100            # How many boids to spawn, may slow after 100-200ish.
 WRAP = False           # False avoids edges, True wraps boids to other side.
