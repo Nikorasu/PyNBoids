@@ -1,8 +1,8 @@
 import pygame as pg
 from math import sin, cos, atan2, radians, degrees
 from random import randint
-
-#   PyNBoids - a Boids simulation - by Nik - github.com/Nikorasu/PyNBoids
+#   PyNBoids - a Boids simulation - Copyright (c) 2021  Nikolaus Stromberg
+#       github.com/Nikorasu/PyNBoids        nikorasu85@gmail.com
 FLLSCRN = False        # True for Fullscreen, or False for Window.
 BOIDZ = 100            # How many boids to spawn, may slow after 100-200ish.
 WRAP = False           # False avoids edges, True wraps boids to other side.
@@ -18,7 +18,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
         self.image.set_colorkey((0, 0, 0))  # defines black as transparent
         randColor = pg.Color(0)  # preps color variable
-        randColor.hsva = (randint(0, 360), 85, 85)  # random color for each boid, randint(20,64) for goldfish
+        randColor.hsva = (randint(0, 360), 85, 85)  # random color for each boid, randint(16,64) for goldfish
         if isFish : pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=2)
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
@@ -123,5 +123,5 @@ def main():
         pg.display.update()
 
 if __name__ == '__main__':
-    main()  # by Nik 2021
+    main()  # by Nik
     pg.quit()
