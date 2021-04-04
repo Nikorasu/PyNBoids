@@ -35,4 +35,4 @@ For more information, and future updates,
         along with this program.
         If not, see: https://www.gnu.org/licenses/gpl-3.0.html
 
-#### Copyright (c) 2021  Nikolaus Stromberg - nikorasu85@gmail.com
+##### Copyright (c) 2021  Nikolaus Stromberg - nikorasu85@gmail.com
