@@ -15,7 +15,7 @@ HEIGHT = 800            # default 800
 FPS = 48                # 30-90
 
 class Boid(pg.sprite.Sprite):
-    def __init__(self, isFish=False):
+    def __init__(self, drawSurf, isFish=False):
         super().__init__()
         self.image = pg.Surface((15, 15))  # surface to draw boid image on
         self.image.set_colorkey((0, 0, 0))  # defines black as transparent
@@ -25,8 +25,8 @@ class Boid(pg.sprite.Sprite):
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)  # sets up forward directional vector
-        self.window = pg.display.get_surface()
-        w, h = self.window.get_size()
+        self.drawSurf = drawSurf #pg.display.get_surface()
+        w, h = self.drawSurf.get_size()
         self.rect = self.image.get_rect(center=(randint(50, w - 50), randint(50, h - 50)))
         self.angle = randint(0, 360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
@@ -62,7 +62,7 @@ class Boid(pg.sprite.Sprite):
             if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
         margin = 50
         turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
-        curW, curH = self.window.get_size()
+        curW, curH = self.drawSurf.get_size()
         # Avoids edges of screen by turning toward their surface-normal
         if not ejWrap and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
             if self.pos.x < margin : tAngle = 0
@@ -85,7 +85,7 @@ class Boid(pg.sprite.Sprite):
         next_pos = self.pos + self.direction * 200 * dt  # 200 is boid speed, 185 for fish?
         self.pos = next_pos
         # optional screen wrap
-        if ejWrap and not self.window.get_rect().contains(self.rect):
+        if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
             if self.rect.bottom < 0 : self.pos.y = curH
             elif self.rect.top > curH : self.pos.y = 0
             if self.rect.right < 0 : self.pos.x = curW
@@ -108,7 +108,7 @@ def main():
     # spawns desired number of boids
     nBoids = pg.sprite.Group()
     for n in range(BOIDZ):
-        nBoids.add(Boid(FISH))
+        nBoids.add(Boid(screen, FISH))
     allBoids = nBoids.sprites()
     clock = pg.time.Clock()
     # main loop
