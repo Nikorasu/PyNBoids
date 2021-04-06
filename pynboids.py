@@ -23,9 +23,11 @@ class Boid(pg.sprite.Sprite):
         randColor.hsva = (randint(0, 360), 85, 85)  # random color for each boid, randint(10,60) for goldfish
         if isFish : pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=3)
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
+        #self.image = pg.transform.scale(self.image,(15,20)) #self.image = pg.transform.scale2x(self.image)
+        self.pSpace = (self.image.get_width() + self.image.get_height()) / 2
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)  # sets up forward directional vector
-        self.drawSurf = drawSurf #pg.display.get_surface()
+        self.drawSurf = drawSurf
         w, h = self.drawSurf.get_size()
         self.rect = self.image.get_rect(center=(randint(50, w - 50), randint(50, h - 50)))
         self.angle = randint(0, 360)  # random start angle, and position ^
@@ -34,32 +36,31 @@ class Boid(pg.sprite.Sprite):
     def update(self, allBoids, dt, ejWrap=False): # most boid behavior/logic done in here
         selfCenter = pg.Vector2(self.rect.center)
         turnDir = xvt = yvt = yat = xat = 0
-        neiboids = sorted([  # gets list of nearby boids, sorted by distance
+        neiboids = sorted([  # gets list of nearby boids, sorted by distance under 200
             iBoid for iBoid in allBoids
-            if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < 200 and iBoid != self ],
+            if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < self.pSpace*12 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
         if (ncount := len(neiboids)) > 1:  # when boid has neighborS (also walrus sets ncount)
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
-            for nBoid in neiboids:  # adds up neighbor vectors and angles to prepare for averaging
+            for nBoid in neiboids:  # adds up neighbor vectors and angles for averaging
                 xvt += nBoid.rect.centerx
                 yvt += nBoid.rect.centery
                 yat += sin(radians(nBoid.angle))
                 xat += cos(radians(nBoid.angle))
-            # computes average angle and vector for neighbors
             tAvejAng = round(degrees(atan2(yat, xat)))
             targetV = (xvt / ncount, yvt / ncount)
             # if closest neighbor is too close, set it as target to avoid
-            if selfCenter.distance_to(nearestBoid) < 16 : targetV = nearestBoid
+            if selfCenter.distance_to(nearestBoid) < self.pSpace : targetV = nearestBoid
             tDiff = targetV - selfCenter  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
-            if tDistance < 64 : tAngle = tAvejAng
+            if tDistance < self.pSpace*6 : tAngle = tAvejAng # 100
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to targets, steer away
-            if tDistance < 16 and targetV == nearestBoid : turnDir = -turnDir
+            if tDistance < self.pSpace and targetV == nearestBoid : turnDir = -turnDir
         margin = 50
         turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
         curW, curH = self.drawSurf.get_size()
@@ -80,9 +81,8 @@ class Boid(pg.sprite.Sprite):
         # adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
-        # controls forward movement/speed
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * 200 * dt  # 200 is boid speed, 185 for fish?
+        next_pos = self.pos + self.direction * (200 + (7-ncount)**2) * dt  # 200 is boid speed, 185 for fish?
         self.pos = next_pos
         # optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
