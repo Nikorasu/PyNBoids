@@ -18,8 +18,8 @@ class Boid(pg.sprite.Sprite):
     def __init__(self, drawSurf, isFish=False):
         super().__init__()
         self.image = pg.Surface((15, 15))
-        self.image.set_colorkey((0, 0, 0))
-        randColor = pg.Color(0)  # preps color
+        self.image.set_colorkey(0)
+        randColor = pg.Color(0)  # preps color for hsva
         randColor.hsva = (randint(0,360), 85, 85)  # random color for each boid, randint(10,60) for goldfish
         if isFish:  # no blue: (randint(120,300) + 180) % 360
             pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=3)
@@ -36,7 +36,10 @@ class Boid(pg.sprite.Sprite):
 
     def update(self, allBoids, dt, ejWrap=False):  # boid behavior
         selfCenter = pg.Vector2(self.rect.center)
+        curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
+        turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
+        margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
             if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < self.pSpace*12 and iBoid != self ],
@@ -62,9 +65,6 @@ class Boid(pg.sprite.Sprite):
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.pSpace and targetV == nearestBoid : turnDir = -turnDir
-        margin = 48
-        turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
-        curW, curH = self.drawSurf.get_size()
         # Avoids edges of screen by turning toward their surface-normal
         if not ejWrap and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
             if self.pos.x < margin : tAngle = 0
