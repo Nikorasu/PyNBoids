@@ -12,7 +12,7 @@ FISH = False            # True here will turn boids into fish.
 BGCOLOR = (0, 0, 0)     # Background color in RGB.
 WIDTH = 1200            # default 1200
 HEIGHT = 800            # default 800
-FPS = 48                # 30-90
+FPS = 48                # 48-90
 
 class Boid(pg.sprite.Sprite):
     def __init__(self, drawSurf, isFish=False):
@@ -38,7 +38,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 3 #1.5 * (dt * 100)  # using dt here seemed to cause spinning
+        turnRate = 2 #1.5 * (dt * 100)  # using dt here seemed to cause spinning
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
