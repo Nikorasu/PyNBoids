@@ -38,7 +38,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 1.7 * (dt * 100)  # 1.7 seems to work the best for turning
+        turnRate = 1.6 * (dt * 100)  # 1.6 seems to have less spinning groups
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -52,7 +52,7 @@ class Boid(pg.sprite.Sprite):
                 yvt += nBoid.rect.centery
                 yat += sin(radians(nBoid.angle))
                 xat += cos(radians(nBoid.angle))
-            tAvejAng = round(degrees(atan2(yat, xat)))
+            tAvejAng = degrees(atan2(yat, xat)) #round()
             targetV = (xvt / ncount, yvt / ncount)
             # if closest neighbor is too close, set it as target to avoid
             if selfCenter.distance_to(nearestBoid) < self.pSpace : targetV = nearestBoid
@@ -82,7 +82,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * (200 + (7-ncount)**2) * dt  # boid speed 200, fish 185?
+        next_pos = self.pos + self.direction * (190 + (7-ncount)**2) * dt  # boid speed, 185 - 200
         self.pos = next_pos
         # optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
