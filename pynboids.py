@@ -38,7 +38,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 1.6 * (dt * 100)  # 1.6 seems to have less spinning groups
+        turnRate = 3 #1.5 * (dt * 100)  # using dt here seemed to cause spinning
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -54,12 +54,12 @@ class Boid(pg.sprite.Sprite):
                 xat += cos(radians(nBoid.angle))
             tAvejAng = degrees(atan2(yat, xat)) #round()
             targetV = (xvt / ncount, yvt / ncount)
-            # if closest neighbor is too close, set it as target to avoid
+            # if too close, move away from closest neighbor
             if selfCenter.distance_to(nearestBoid) < self.pSpace : targetV = nearestBoid
             tDiff = targetV - selfCenter  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
-            if tDistance < self.pSpace*5 : tAngle = tAvejAng # 100
+            if tDistance < self.pSpace*6 : tAngle = tAvejAng # 100 #and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
