@@ -6,7 +6,7 @@ PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
 FLLSCRN = False         # True for Fullscreen, or False for Window.
-BOIDZ = 80              # How many boids to spawn, may slow after 200ish.
+BOIDZ = 85              # How many boids to spawn, may slow after 200ish.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 FISH = False            # True here will turn boids into fish.
 BGCOLOR = (0, 0, 0)     # Background color in RGB.
@@ -59,7 +59,7 @@ class Boid(pg.sprite.Sprite):
             tDiff = targetV - selfCenter  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
-            if tDistance < self.pSpace*6 : tAngle = tAvejAng # 100
+            if tDistance < self.pSpace*5 : tAngle = tAvejAng # 100
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
