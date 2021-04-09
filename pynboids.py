@@ -15,13 +15,13 @@ HEIGHT = 800            # default 800
 FPS = 48                # 48-90
 
 class Boid(pg.sprite.Sprite):
-    def __init__(self, drawSurf, isFish=False):
+    def __init__(self, drawSurf, isFish=False, cHSV=None):
         super().__init__()
         self.image = pg.Surface((15, 15))
         self.image.set_colorkey(0)
         randColor = pg.Color(0)  # preps color for hsva
-        randColor.hsva = (randint(0,360), 85, 85)  # random color for each boid, randint(10,60) for goldfish
-        if isFish:  # no blue: (randint(120,300) + 180) % 360
+        randColor.hsva = (randint(0,360), 85, 85) if cHSV is None else cHSV # randint(10,60) goldfish
+        if isFish:  # (randint(120,300) + 180) % 360 noblues
             pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=3)
             self.image = pg.transform.scale(self.image,(18,26))
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
@@ -38,7 +38,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 2 #1.5 * (dt * 100)  # using dt here seemed to cause spinning
+        turnRate = 2.5 #1.5 * (dt * 100)  # dt seems to cause more spinning
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
