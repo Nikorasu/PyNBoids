@@ -5,26 +5,18 @@ import pygame as pg
 Multilayer Boids test
 Copyright (c) 2021  Nikolaus Stromberg
 '''
-BPL = 12              # How many boids per layer
-WRAP = True            # False avoids edges, True wraps boids to other side.
+BPL = 20                # How many boids per layer
+WRAP = False            # False avoids edges, True wraps boids to other side.
 BGCOLOR = (0, 0, 42)    # Background color in RGB.
 FPS = 48                # 30-90
 
 def main():
     pg.init()  # prepare window
     pg.display.set_caption("Multilayer Test")
-
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED) #pg.HWSURFACE | pg.DOUBLEBUF |
     pg.display.toggle_fullscreen()  # linux workaround
     pg.mouse.set_visible(False)
-
-    #layer1_surf = pg.Surface(currentRez)
-    #layer2_surf = pg.Surface(currentRez)
-    #layer3_surf = pg.Surface(currentRez)
-    #layer1_surf.set_colorkey(0)
-    #layer2_surf.set_colorkey(0)
-    #layer3_surf.set_colorkey(0)
 
     layer1_Boids = pg.sprite.Group()
     layer2_Boids = pg.sprite.Group()
@@ -50,21 +42,14 @@ def main():
         dt = clock.tick(FPS) / 1000
 
         screen.fill(BGCOLOR)
-        #layer1_surf.fill(0)
-        #layer2_surf.fill(0)
-        #layer3_surf.fill(0)
 
         layer1_Boids.update(lyr1Boids, dt, WRAP)
         layer2_Boids.update(lyr2Boids, dt, WRAP)
         layer3_Boids.update(lyr3Boids, dt, WRAP)
 
-        layer1_Boids.draw(screen)#layer1_surf)
-        layer2_Boids.draw(screen)#layer2_surf)
-        layer3_Boids.draw(screen)#layer3_surf)
-
-        #pg.Surface.blit(screen, layer1_surf, (0,0))
-        #pg.Surface.blit(screen, layer2_surf, (0,0))
-        #pg.Surface.blit(screen, layer3_surf, (0,0))
+        layer1_Boids.draw(screen)
+        layer2_Boids.draw(screen)
+        layer3_Boids.draw(screen)
 
         pg.display.update()
 
