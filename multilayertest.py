@@ -6,6 +6,7 @@ Multilayer Boids test
 Copyright (c) 2021  Nikolaus Stromberg
 '''
 BPL = 20                # How many boids per layer
+FLLSCRN = False         # True for Fullscreen, or False for Window.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 BGCOLOR = (0, 0, 42)    # Background color in RGB.
 FPS = 48                # 30-90
@@ -14,9 +15,11 @@ def main():
     pg.init()  # prepare window
     pg.display.set_caption("Multilayer Test")
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
-    screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED) #pg.HWSURFACE | pg.DOUBLEBUF |
-    pg.display.toggle_fullscreen()  # linux workaround
-    pg.mouse.set_visible(False)
+    if FLLSCRN:
+        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED) #pg.HWSURFACE | pg.DOUBLEBUF |
+        pg.display.toggle_fullscreen()  # linux fix
+        pg.mouse.set_visible(False)
+    else: screen = pg.display.set_mode(currentRez, pg.RESIZABLE)
 
     layer1_Boids = pg.sprite.Group()
     layer2_Boids = pg.sprite.Group()
