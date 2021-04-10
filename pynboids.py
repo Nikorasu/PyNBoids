@@ -5,10 +5,10 @@ import pygame as pg
 PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
-FLLSCRN = True          # True for Fullscreen, or False for Window.
-BOIDZ = 32             # How many boids to spawn, may slow after 200ish.
+FLLSCRN = False         # True for Fullscreen, or False for Window.
+BOIDZ = 85              # How many boids to spawn, may slow after 200ish.
 WRAP = False            # False avoids edges, True wraps boids to other side.
-FISH = True            # True here will turn boids into fish.
+FISH = False            # True here will turn boids into fish.
 BGCOLOR = (0, 0, 0)     # Background color in RGB.
 WIDTH = 1200            # default 1200
 HEIGHT = 800            # default 800
