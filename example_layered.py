@@ -2,22 +2,22 @@ from pynboids import Boid
 from random import randint
 import pygame as pg
 '''
-Multilayer Boids test
+Boid Import Example w/ layered groups.
 Copyright (c) 2021  Nikolaus Stromberg
 '''
-BPL = 32                # How many boids per layer
+BPL = 42                # How many boids per layer
 FLLSCRN = False         # True for Fullscreen, or False for Window.
 WRAP = False            # False avoids edges, True wraps boids to other side.
-BGCOLOR = (0, 0, 42)    # Background color in RGB.
+BGCOLOR = (0, 0, 48)    # Background color in RGB.
 FPS = 48                # 30-90
 
 def main():
-    pg.init()  # prepare window
+    pg.init()
     pg.display.set_caption("Multilayer Test")
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     if FLLSCRN:
-        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED) #pg.HWSURFACE | pg.DOUBLEBUF |
-        pg.display.toggle_fullscreen()  # linux fix
+        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED) #pg.HWSURFACE | pg.DOUBLEBUF
+        pg.display.toggle_fullscreen()  # 4linux
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode(currentRez, pg.RESIZABLE)
 

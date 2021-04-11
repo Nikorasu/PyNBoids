@@ -62,7 +62,7 @@ class Boid(pg.sprite.Sprite):
             if tDistance < self.pSpace*6 : tAngle = tAvejAng # 100 #and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
-            if abs(tAngle - self.angle) > 1: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
+            if abs(tAngle - self.angle) > 0.8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.pSpace and targetV == nearestBoid : turnDir = -turnDir
         # Avoids edges of screen by turning toward their surface-normal
