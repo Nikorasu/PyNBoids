@@ -27,25 +27,25 @@ class Boid(pg.sprite.Sprite):
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.pSpace = (self.image.get_width() + self.image.get_height()) / 2
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
-        self.direction = pg.Vector2(1, 0)  # sets up forward directional vector
+        self.direction = pg.Vector2(1, 0)  # sets up forward direction
         self.drawSurf = drawSurf
         w, h = self.drawSurf.get_size()
         self.rect = self.image.get_rect(center=(randint(50, w - 50), randint(50, h - 50)))
         self.angle = randint(0, 360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, allBoids, dt, ejWrap=False):  # boid behavior
+    def update(self, allBoids, dt, fps, ejWrap=False):  # boid behavior
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 2.5 #1.5 * (dt * 100)  # dt seems to cause more spinning
+        turnRate = 2.4 * (dt * fps) # watch for spinning
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
             if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < self.pSpace*12 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter)) # 200
         del neiboids[7:]  # keep 7 closest, dump the rest
-        if (ncount := len(neiboids)) > 1:  # when boid has neighborS (walrus sets ncount)
+        if (ncount := len(neiboids)) > 0:  # when boid has neighbors (walrus sets ncount)
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors & angles for averaging
                 xvt += nBoid.rect.centerx
@@ -62,7 +62,7 @@ class Boid(pg.sprite.Sprite):
             if tDistance < self.pSpace*6 : tAngle = tAvejAng # 100 #and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
-            turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
+            if abs(tAngle - self.angle) > 1: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.pSpace and targetV == nearestBoid : turnDir = -turnDir
         # Avoids edges of screen by turning toward their surface-normal
@@ -82,7 +82,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * (190 + (7-ncount)**2) * dt  # boid speed, 185 - 200
+        next_pos = self.pos + self.direction * (3.5 + (7-ncount)/10) * (dt * fps)
         self.pos = next_pos
         # optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
@@ -119,7 +119,7 @@ def main():
                 return
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
-        nBoids.update(allBoids, dt, WRAP)
+        nBoids.update(allBoids, dt, FPS, WRAP)
         nBoids.draw(screen)
         pg.display.update()
 

@@ -5,7 +5,7 @@ import pygame as pg
 Multilayer Boids test
 Copyright (c) 2021  Nikolaus Stromberg
 '''
-BPL = 20                # How many boids per layer
+BPL = 32                # How many boids per layer
 FLLSCRN = False         # True for Fullscreen, or False for Window.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 BGCOLOR = (0, 0, 42)    # Background color in RGB.
@@ -46,9 +46,9 @@ def main():
 
         screen.fill(BGCOLOR)
 
-        layer1_Boids.update(lyr1Boids, dt, WRAP)
-        layer2_Boids.update(lyr2Boids, dt, WRAP)
-        layer3_Boids.update(lyr3Boids, dt, WRAP)
+        layer1_Boids.update(lyr1Boids, dt, FPS, WRAP)
+        layer2_Boids.update(lyr2Boids, dt, FPS, WRAP)
+        layer3_Boids.update(lyr3Boids, dt, FPS, WRAP)
 
         layer1_Boids.draw(screen)
         layer2_Boids.draw(screen)
