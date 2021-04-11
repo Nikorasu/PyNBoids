@@ -45,7 +45,7 @@ class Boid(pg.sprite.Sprite):
             if pg.Vector2(iBoid.rect.center).distance_to(selfCenter) < self.pSpace*12 and iBoid != self ],
             key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter)) # 200
         del neiboids[7:]  # keep 7 closest, dump the rest
-        if (ncount := len(neiboids)) > 0:  # when boid has neighbors (walrus sets ncount)
+        if (ncount := len(neiboids)) > 1:  # when boid has neighborS (walrus sets ncount)
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors & angles for averaging
                 xvt += nBoid.rect.centerx
@@ -82,7 +82,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.org_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * (3.5 + (7-ncount)/10) * (dt * fps)
+        next_pos = self.pos + self.direction * (3.5 + (7-ncount)/14) * (dt * fps)
         self.pos = next_pos
         # optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):

@@ -25,11 +25,10 @@ def main():
     layer2_Boids = pg.sprite.Group()
     layer3_Boids = pg.sprite.Group()
 
-    for n in range(BPL):
-        #randColor.hsva = (((randint(120,300) + 180) % 360),85,85) # randint(10,60) goldfish
-        layer1_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),50,33)))
-        layer2_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),64,66)))
-        layer3_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),80,99)))
+    for n in range(BPL):  # randint(10,60) goldfish
+        layer1_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),30,30)))
+        layer2_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),60,60)))
+        layer3_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),90,90)))
 
     lyr1Boids = layer1_Boids.sprites()
     lyr2Boids = layer2_Boids.sprites()
