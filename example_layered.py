@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from pynboids import Boid
 from random import randint
 import pygame as pg
@@ -16,8 +17,8 @@ def main():
     pg.display.set_caption("Multilayer Test")
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     if FLLSCRN:
-        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED) #pg.HWSURFACE | pg.DOUBLEBUF
-        pg.display.toggle_fullscreen()  # 4linux
+        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
+        pg.display.toggle_fullscreen()  #pg.HWSURFACE | pg.DOUBLEBUF
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode(currentRez, pg.RESIZABLE)
 
@@ -35,7 +36,6 @@ def main():
     lyr3Boids = layer3_Boids.sprites()
 
     clock = pg.time.Clock()
-    # main loop
     while True:
         events = pg.event.get()
         for e in events:

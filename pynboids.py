@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from math import sin, cos, atan2, radians, degrees
 from random import randint
 import pygame as pg
@@ -105,9 +106,8 @@ def main():
         pg.display.toggle_fullscreen()  # linux fix
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
-    # spawns desired number of boids
     nBoids = pg.sprite.Group()
-    for n in range(BOIDZ):
+    for n in range(BOIDZ):  # spawns boids
         nBoids.add(Boid(screen, FISH))
     allBoids = nBoids.sprites()
     clock = pg.time.Clock()
