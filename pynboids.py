@@ -23,7 +23,7 @@ class Boid(pg.sprite.Sprite):
         randColor.hsva = (randint(0,360), 85, 85) if cHSV is None else cHSV # randint(10,60) goldfish
         if isFish:  # (randint(120,300) + 180) % 360 noblues
             pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=3)
-            self.image = pg.transform.scale(self.image,(18,26))
+            self.image = pg.transform.scale(self.image,(18,28))
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.pSpace = (self.image.get_width() + self.image.get_height()) / 2
         self.org_image = pg.transform.rotate(self.image.copy(), -90)
