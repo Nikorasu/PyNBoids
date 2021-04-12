@@ -6,7 +6,7 @@ import pygame as pg
 Boid Import Example w/ layered groups.
 Copyright (c) 2021  Nikolaus Stromberg
 '''
-BPL = 42                # How many boids per layer
+BPL = 48                # How many boids per layer
 FLLSCRN = False         # True for Fullscreen, or False for Window.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 BGCOLOR = (0, 0, 48)    # Background color in RGB.
@@ -14,7 +14,7 @@ FPS = 48                # 30-90
 
 def main():
     pg.init()
-    pg.display.set_caption("Multilayer Test")
+    pg.display.set_caption("Fish Tank")
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     if FLLSCRN:
         screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
@@ -22,18 +22,18 @@ def main():
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode(currentRez, pg.RESIZABLE)
 
-    layer1_Boids = pg.sprite.Group()
-    layer2_Boids = pg.sprite.Group()
-    layer3_Boids = pg.sprite.Group()
+    bg_surf = pg.Surface((currentRez[0]*1.1,currentRez[1]*1.1))
+    bg_surf.set_colorkey(0)
 
-    for n in range(BPL):  # randint(10,60) goldfish
-        layer1_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),30,30)))
-        layer2_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),60,60)))
-        layer3_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),90,90)))
+    bg_Boids = pg.sprite.Group()
+    front_Boids = pg.sprite.Group()
 
-    lyr1Boids = layer1_Boids.sprites()
-    lyr2Boids = layer2_Boids.sprites()
-    lyr3Boids = layer3_Boids.sprites()
+    for n in range(BPL):  # 4goldfish: randint(10,60)  noblues: (((randint(120,300)+180)%360),35,35)
+        bg_Boids.add(Boid(bg_surf, True, (((randint(120,300) + 180) % 360),35,35)))
+        front_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),95,95)))
+
+    bgBoids = bg_Boids.sprites()
+    frontBoids = front_Boids.sprites()
 
     clock = pg.time.Clock()
     while True:
@@ -43,16 +43,16 @@ def main():
                 return
         dt = clock.tick(FPS) / 1000
 
+        bg_surf.fill(BGCOLOR)
         screen.fill(BGCOLOR)
 
-        layer1_Boids.update(lyr1Boids, dt, FPS, WRAP)
-        layer2_Boids.update(lyr2Boids, dt, FPS, WRAP)
-        layer3_Boids.update(lyr3Boids, dt, FPS, WRAP)
+        bg_Boids.update(bgBoids, dt, FPS, WRAP)
+        front_Boids.update(frontBoids, dt, FPS, WRAP)
 
-        layer1_Boids.draw(screen)
-        layer2_Boids.draw(screen)
-        layer3_Boids.draw(screen)
-
+        bg_Boids.draw(bg_surf)
+        bg_surf2 = pg.transform.scale(bg_surf,screen.get_size())
+        pg.Surface.blit(screen, bg_surf2, (0,0))
+        front_Boids.draw(screen)
         pg.display.update()
 
 if __name__ == '__main__':
