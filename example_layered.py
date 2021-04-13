@@ -7,7 +7,7 @@ Boid Import Example w/ layered groups.
 Copyright (c) 2021  Nikolaus Stromberg
 '''
 BPL = 48                # How many boids per layer
-FLLSCRN = False         # True for Fullscreen, or False for Window.
+FLLSCRN = True          # True for Fullscreen, or False for Window.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 BGCOLOR = (0, 0, 48)    # Background color in RGB.
 FPS = 48                # 30-90
@@ -17,33 +17,33 @@ def main():
     pg.display.set_caption("Fish Tank")
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     if FLLSCRN:
-        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
-        pg.display.toggle_fullscreen()  #pg.HWSURFACE | pg.DOUBLEBUF
+        screen = pg.display.set_mode(currentRez, pg.SCALED)
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode(currentRez, pg.RESIZABLE)
 
-    bg_surf = pg.Surface((currentRez[0]*1.1,currentRez[1]*1.1))
+    bg_surf = pg.Surface((screen.get_width()*1.1, screen.get_height()*1.1))
     bg_surf.set_colorkey(0)
-
+    top_surf = pg.Surface((screen.get_width(), screen.get_height()))
+    top_surf.set_colorkey(0)
     bg_Boids = pg.sprite.Group()
     front_Boids = pg.sprite.Group()
-
-    for n in range(BPL):  # 4goldfish: randint(10,60)  noblues: (((randint(120,300)+180)%360),35,35)
+    # goldfish: randint(10,60)  noblues: (((randint(120,300)+180)%360),35,35)
+    for n in range(BPL):
         bg_Boids.add(Boid(bg_surf, True, (((randint(120,300) + 180) % 360),35,35)))
-        front_Boids.add(Boid(screen, True, (((randint(120,300) + 180) % 360),95,95)))
-
+        front_Boids.add(Boid(top_surf, True, (((randint(120,300) + 180) % 360),95,95)))
     bgBoids = bg_Boids.sprites()
     frontBoids = front_Boids.sprites()
 
     clock = pg.time.Clock()
     while True:
-        events = pg.event.get()
-        for e in events:
+        for e in pg.event.get():
             if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 return
+
         dt = clock.tick(FPS) / 1000
 
-        bg_surf.fill(BGCOLOR)
+        bg_surf.fill(0)
+        top_surf.fill(0)
         screen.fill(BGCOLOR)
 
         bg_Boids.update(bgBoids, dt, FPS, WRAP)
@@ -51,8 +51,12 @@ def main():
 
         bg_Boids.draw(bg_surf)
         bg_surf2 = pg.transform.scale(bg_surf,screen.get_size())
-        pg.Surface.blit(screen, bg_surf2, (0,0))
-        front_Boids.draw(screen)
+        screen.blit(bg_surf2, (0,0))
+
+        front_Boids.draw(top_surf)
+        top_surf2 = pg.transform.scale(top_surf,screen.get_size())
+        screen.blit(top_surf2, (0,0))
+
         pg.display.update()
 
 if __name__ == '__main__':
