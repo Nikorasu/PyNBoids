@@ -18,20 +18,20 @@ FPS = 48                # 48-90
 class Boid(pg.sprite.Sprite):
     def __init__(self, drawSurf, isFish=False, cHSV=None):
         super().__init__()
+        self.drawSurf = drawSurf
         self.image = pg.Surface((15, 15))
         self.image.set_colorkey(0)
-        randColor = pg.Color(0)  # preps color for hsva
+        randColor = pg.Color(0)  # preps color so we can use hsva
         randColor.hsva = (randint(0,360), 85, 85) if cHSV is None else cHSV # randint(10,60) goldfish
         if isFish:  # (randint(120,300) + 180) % 360 noblues
             pg.draw.polygon(self.image, randColor, ((7,0), (12,5), (3,14), (11,14), (2,5), (7,0)), width=3)
             self.image = pg.transform.scale(self.image,(18,28))
         else : pg.draw.polygon(self.image, randColor, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.pSpace = (self.image.get_width() + self.image.get_height()) / 2
-        self.org_image = pg.transform.rotate(self.image.copy(), -90)
+        self.orig_image = pg.transform.rotate(self.image.copy(), -90)
         self.direction = pg.Vector2(1, 0)  # sets up forward direction
-        self.drawSurf = drawSurf
-        w, h = self.drawSurf.get_size()
-        self.rect = self.image.get_rect(center=(randint(50, w - 50), randint(50, h - 50)))
+        dS_w, dS_h = self.drawSurf.get_size()
+        self.rect = self.image.get_rect(center=(randint(50, dS_w - 50), randint(50, dS_h - 50)))
         self.angle = randint(0, 360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
@@ -39,7 +39,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 2.4 * (dt * fps) # watch for spinning
+        turnRate = 2.4 * (dt * fps) # too high might cause spinning
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -80,7 +80,7 @@ class Boid(pg.sprite.Sprite):
             self.angle += turnRate * abs(turnDir) / turnDir
             self.angle %= 360  # ensures that the angle stays within 0-360
         # adjusts angle of boid image to match heading
-        self.image = pg.transform.rotate(self.org_image, -self.angle)
+        self.image = pg.transform.rotate(self.orig_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
         next_pos = self.pos + self.direction * (3.5 + (7-ncount)/14) * (dt * fps)
@@ -102,8 +102,7 @@ def main():
     # setup fullscreen or window mode
     if FLLSCRN:  #screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
-        screen = pg.display.set_mode(currentRez, pg.FULLSCREEN | pg.SCALED)
-        pg.display.toggle_fullscreen()  # linux fix
+        screen = pg.display.set_mode(currentRez, pg.SCALED) # pg.FULLSCREEN | #pg.display.toggle_fullscreen()
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
     nBoids = pg.sprite.Group()
@@ -113,10 +112,10 @@ def main():
     clock = pg.time.Clock()
     # main loop
     while True:
-        events = pg.event.get()
-        for e in events:
+        for e in pg.event.get():
             if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 return
+
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
         nBoids.update(allBoids, dt, FPS, WRAP)
