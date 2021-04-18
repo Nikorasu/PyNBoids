@@ -39,7 +39,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 2.4 * (dt * fps) # too high might cause spinning
+        turnRate = 2.4 * fps * dt  # too high might cause spinning
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -60,7 +60,7 @@ class Boid(pg.sprite.Sprite):
             tDiff = targetV - selfCenter  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
-            if tDistance < self.pSpace*6 : tAngle = tAvejAng # 100 #and ncount > 2
+            if tDistance < self.pSpace*6 : tAngle = tAvejAng # and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
             if abs(tAngle - self.angle) > 0.8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
@@ -83,7 +83,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.orig_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * (3.5 + (7-ncount)/14) * (dt * fps)
+        next_pos = self.pos + self.direction * (3.5 + (7-ncount)/14) * fps * dt
         self.pos = next_pos
         # optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
@@ -106,7 +106,7 @@ def main():
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
     nBoids = pg.sprite.Group()
-    for n in range(BOIDZ):  # spawns boids
+    for n in range(BOIDZ):  # spawns desired # of boidz
         nBoids.add(Boid(screen, FISH))
     allBoids = nBoids.sprites()
     clock = pg.time.Clock()
