@@ -39,7 +39,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 2.4 * fps * dt  # too high might cause spinning
+        turnRate = 124 * dt #2.4 * fps * dt
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -83,7 +83,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.orig_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.direction = pg.Vector2(1, 0).rotate(self.angle).normalize()
-        next_pos = self.pos + self.direction * (3.5 + (7-ncount)/14) * fps * dt
+        next_pos = self.pos + self.direction * (180 + (7-ncount)**2) * dt #(3.5 + (7-ncount)/14) * (fps * dt)
         self.pos = next_pos
         # optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
