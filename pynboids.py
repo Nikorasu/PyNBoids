@@ -7,7 +7,7 @@ PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
 FLLSCRN = False         # True for Fullscreen, or False for Window.
-BOIDZ = 85              # How many boids to spawn, may slow after 200ish.
+BOIDZ = 88              # How many boids to spawn, may slow after 200ish.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 FISH = False            # True here will turn boids into fish.
 BGCOLOR = (0, 0, 0)     # Background color in RGB.
@@ -35,7 +35,7 @@ class Boid(pg.sprite.Sprite):
         self.angle = randint(0, 360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, allBoids, dt, fps, ejWrap=False):  # boid behavior
+    def update(self, allBoids, dt, ejWrap=False):  # boid behavior
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
@@ -118,7 +118,7 @@ def main():
 
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
-        nBoids.update(allBoids, dt, FPS, WRAP)
+        nBoids.update(allBoids, dt, WRAP)
         nBoids.draw(screen)
         pg.display.update()
 

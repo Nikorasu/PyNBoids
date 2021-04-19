@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 from pynboids import Boid
 from random import randint
+from math import cos
 import pygame as pg
 '''
-Boid Import Example w/ layered groups.
+Boid Import Example, Fish Tank Scene.
 Copyright (c) 2021  Nikolaus Stromberg
 '''
-BPL = 48                # How many boids per layer
+BPL = 42                # How many boids per layer
 FLLSCRN = True          # True for Fullscreen, or False for Window.
 WRAP = False            # False avoids edges, True wraps boids to other side.
 BGCOLOR = (0, 0, 48)    # Background color in RGB.
@@ -19,7 +20,7 @@ def main():
     if FLLSCRN:
         screen = pg.display.set_mode(currentRez, pg.SCALED)
         pg.mouse.set_visible(False)
-    else: screen = pg.display.set_mode(currentRez, pg.RESIZABLE)
+    else: screen = pg.display.set_mode((int(currentRez[0]*0.99),int(currentRez[1]*0.94)), pg.SCALED | pg.RESIZABLE)
 
     bg_surf = pg.Surface((screen.get_width()*1.1, screen.get_height()*1.1))
     bg_surf.set_colorkey(0)
@@ -34,6 +35,10 @@ def main():
     bgBoids = bg_Boids.sprites()
     frontBoids = front_Boids.sprites()
 
+    #Bubbles = pg.sprite.Group()
+    #for b in range(10):
+    #    Bubbles.add(Bubble(top_surf))
+
     clock = pg.time.Clock()
     while True:
         for e in pg.event.get():
@@ -46,17 +51,18 @@ def main():
         top_surf.fill(0)
         screen.fill(BGCOLOR)
 
-        bg_Boids.update(bgBoids, dt, FPS, WRAP)
-        front_Boids.update(frontBoids, dt, FPS, WRAP)
+        bg_Boids.update(bgBoids, dt, WRAP)
+        #Bubbles.update(dt, FPS)
+        front_Boids.update(frontBoids, dt, WRAP)
 
         bg_Boids.draw(bg_surf)
         bg_surf2 = pg.transform.scale(bg_surf,screen.get_size())
-        screen.blit(bg_surf2, (0,0))
-
+        #screen.blit(bg_surf2, (0,0))
+        #Bubbles.draw(top_surf)
         front_Boids.draw(top_surf)
         top_surf2 = pg.transform.scale(top_surf,screen.get_size())
-        screen.blit(top_surf2, (0,0))
-
+        #screen.blit(top_surf2, (0,0))
+        screen.blits([(bg_surf2, (0,0)), (top_surf2, (0,0))])
         pg.display.update()
 
 if __name__ == '__main__':
