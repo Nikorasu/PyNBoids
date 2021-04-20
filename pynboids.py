@@ -39,7 +39,7 @@ class Boid(pg.sprite.Sprite):
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 124 * dt #2.4 * fps * dt
+        turnRate = 120 * dt #2.4 * fps * dt
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -63,7 +63,7 @@ class Boid(pg.sprite.Sprite):
             if tDistance < self.pSpace*6 : tAngle = tAvejAng # and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.angle) + 180
-            if abs(tAngle - self.angle) > 0.8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
+            if abs(tAngle - self.angle) > .8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.pSpace and targetV == nearestBoid : turnDir = -turnDir
         # Avoids edges of screen by turning toward their surface-normal
