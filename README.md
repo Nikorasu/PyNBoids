@@ -1,11 +1,11 @@
+![Preview](preview.gif "Preview")
+
 # PyNBoids
 
 ### A Python Boids Simulation
 
 This is a [Boids simulation](https://en.wikipedia.org/wiki/Boids "Wikipedia"),
 written in Python3 with Pygame2.
-
-![Preview](preview.gif "Preview")
 
 **To use** save the `pynboids.py` file somewhere (and `nboids.png` if you want
 it's icon, not required), and run via python. (Example: `python3 pynboids.py`)
