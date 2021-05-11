@@ -3,12 +3,12 @@ from math import pi, sin, cos, atan2, radians, degrees
 from random import randint
 import pygame as pg
 import numpy as np
-'''
-PixelBoids - Alternate Boids drawn to surfarray, using numpy.
-Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
-'''
-BOIDZ = 100             # Number of Boids
+
+#  PixelBoids - Alternate Boids drawn to surfarray, using numpy.
+#  Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
+
 FLLSCRN = True          # True for Fullscreen, or False for Window.
+BOIDZ = 100             # Number of Boids
 WIDTH = 1200            # default 1200
 HEIGHT = 800            # default 800
 FPS = 60                # 48-90
@@ -53,8 +53,8 @@ class BoidPix():
             if abs(tAngle - self.ang) > .8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < 4 and targetV == nearestBoid : turnDir = -turnDir
-
-        if turnDir != 0:  # steers based on turnDir, handles left or right
+        # steers based on turnDir, handles left or right
+        if turnDir != 0:
             self.ang += 2 * abs(turnDir) / turnDir
             self.ang %= 360  # ensures that the angle stays within 0-360
 
@@ -97,9 +97,9 @@ def main():
     screenSize = (cur_w, cur_h)
 
     pheroLayer = skyArray(screenSize)
-    boidList = []  # spawns desired # of boidz
-    for n in range(BOIDZ) : boidList.append(BoidPix(pheroLayer))
-    for n in range(BOIDZ) : boidList[n].boidinput(boidList)
+    boidList = []
+    for n in range(BOIDZ) : boidList.append(BoidPix(pheroLayer))  # spawns desired # of boidz
+    for n in range(BOIDZ) : boidList[n].boidinput(boidList)  # gives boids list of all boids
 
     clock = pg.time.Clock()
     fpsChecker = 0
