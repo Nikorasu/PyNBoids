@@ -12,7 +12,7 @@ BOIDZ = 100             # Number of Boids
 WIDTH = 1200            # default 1200
 HEIGHT = 800            # default 800
 FPS = 60                # 48-90
-PRATIO = 5              # Pixel Size for Pheromone grid, odds
+PRATIO = 4              # Pixel Size for Pheromone grid, odds
 
 class BoidPix():
     def __init__(self, surfArray):
@@ -29,8 +29,8 @@ class BoidPix():
         # Get list of nearby boids, sorted by distance
         neiboids = sorted([
             iBoid for iBoid in self.allBoids
-            if pg.Vector2(iBoid.pos).distance_to(self.pos) < 32 and iBoid != self ],
-            key=lambda i: pg.Vector2(i.pos).distance_to(self.pos)) # 200
+            if pg.Vector2(iBoid.pos).distance_to(self.pos) < 48 and iBoid != self ],
+            key=lambda i: pg.Vector2(i.pos).distance_to(self.pos))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # When boid has neighborS (walrus sets ncount)
         if (ncount := len(neiboids)) > 1:
@@ -50,7 +50,7 @@ class BoidPix():
             if tDistance < 16 : tAngle = tAvejAng # and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.ang) + 180
-            if abs(tAngle - self.ang) > .8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
+            if abs(tAngle - self.ang) > 1: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < 4 and targetV == nearestBoid : turnDir = -turnDir
         # steers based on turnDir, handles left or right
@@ -72,7 +72,7 @@ class BoidPix():
     def boidinput(self, boidList):
         self.allBoids = boidList
 
-class skyArray():
+class surfaceArray():
     def __init__(self, bigSize):
         self.surfSize = (bigSize[0]//PRATIO, bigSize[1]//PRATIO)
         self.image = pg.Surface(self.surfSize).convert()
@@ -96,9 +96,9 @@ def main():
     cur_w, cur_h = screen.get_size()
     screenSize = (cur_w, cur_h)
 
-    pheroLayer = skyArray(screenSize)
+    drawLayer = surfaceArray(screenSize)
     boidList = []
-    for n in range(BOIDZ) : boidList.append(BoidPix(pheroLayer))  # spawns desired # of boidz
+    for n in range(BOIDZ) : boidList.append(BoidPix(drawLayer))  # spawns desired # of boidz
     for n in range(BOIDZ) : boidList[n].boidinput(boidList)  # gives boids list of all boids
 
     clock = pg.time.Clock()
@@ -114,8 +114,8 @@ def main():
 
         screen.fill(0)
 
-        pheroImg = pheroLayer.update(dt)
-        rescaled_img = pg.transform.scale(pheroImg, (cur_w, cur_h))
+        drawImg = drawLayer.update(dt)
+        rescaled_img = pg.transform.scale(drawImg, (cur_w, cur_h))
         pg.Surface.blit(screen, rescaled_img, (0,0))
 
         for n in range(BOIDZ): boidList[n].update(dt)
