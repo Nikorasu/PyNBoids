@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+from math import pi, sin, cos, atan2, radians, degrees
 from random import randint
 import pygame as pg
 import numpy as np
 
-#  PixelBoids - Pixel-based Boids alternative, drawn to a fading surfarray.
-#  Uses numpy array math in place of math library, less for loops.
+#  PixelBoids - Alternate Boids drawn to surfarray, using numpy a little.
 #  Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 
 FLLSCRN = True          # True for Fullscreen, or False for Window.
@@ -12,72 +12,73 @@ BOIDZ = 100             # Number of Boids
 WIDTH = 1200            # default 1200
 HEIGHT = 800            # default 800
 FPS = 60                # 48-90
-PRATIO = 4              # Pixel Size for Pheromone grid
+PRATIO = 5              # Pixel Size for Pheromone grid
 
 class BoidPix():
-    def __init__(self, boidNum, surfArray):
-        self.bnum = boidNum
-        self.sdata = surfArray
+    def __init__(self, surfArray):
+        self.sArray = surfArray
         self.maxW = surfArray.surfSize[0]
         self.maxH = surfArray.surfSize[1]
         self.color = pg.Color(0)  # preps color so we can use hsva
-        self.color.hsva = (randint(0,360), 90, 90)
+        self.color.hsva = (randint(0,360), 85, 85)
         self.ang = randint(0, 360)  # random start angle, and position
         self.dir = pg.Vector2(1, 0).rotate(self.ang)
         self.pos = (randint(10, self.maxW - 10), randint(10, self.maxH - 10))
     def update(self, dt):
         turnDir = xvt = yvt = yat = xat = 0
-        allBoidA = self.sdata.boid_array
-        # Get list of nearby boids, sorted by distance  #array_dists = np.empty((BOIDZ),dtype=float)
-        array_dists = (self.pos[0] - allBoidA[:,0])**2 + (self.pos[1] - allBoidA[:,1])**2
-        closeBoidIs = np.argsort(array_dists)[1:7]
-        neiboids = np.column_stack((allBoidA[closeBoidIs], np.sqrt(array_dists[closeBoidIs])))
-        neiboids = neiboids[neiboids[:,3] < 48]
-
-        if neiboids.size > 1:
-            yat = np.sum(np.sin(np.deg2rad(neiboids[:,2])))
-            xat = np.sum(np.cos(np.deg2rad(neiboids[:,2])))
-            # averages the positions and angles of neighbors
-            tAvejAng = np.rad2deg(np.arctan2(yat, xat))
-            targetV = (np.mean(neiboids[:,0]),np.mean(neiboids[:,1]))
+        # Get list of nearby boids, sorted by distance
+        neiboids = sorted([
+            iBoid for iBoid in self.allBoids
+            if pg.Vector2(iBoid.pos).distance_to(self.pos) < 48 and iBoid != self ],
+            key=lambda i: pg.Vector2(i.pos).distance_to(self.pos))
+        del neiboids[7:]  # keep 7 closest, dump the rest
+        # When boid has neighborS (walrus sets ncount)
+        if (ncount := len(neiboids)) > 1:
+            nearestBoid = pg.Vector2(neiboids[0].pos)
+            for nBoid in neiboids:  # adds up neighbor vectors & angles for averaging
+                xvt += nBoid.pos[0]
+                yvt += nBoid.pos[1]
+                yat += sin(radians(nBoid.ang))
+                xat += cos(radians(nBoid.ang))
+            tAvejAng = degrees(atan2(yat, xat)) #round()
+            targetV = (xvt / ncount, yvt / ncount)
             # if too close, move away from closest neighbor
-            if neiboids[0,3] < 4 : targetV = (neiboids[0,0],neiboids[0,1])
-            # get angle differences for steering
-            tDiff = pg.Vector2(targetV) - self.pos
+            if nearestBoid.distance_to(self.pos) < 4 : targetV = nearestBoid
+            tDiff = pg.Vector2(targetV) - self.pos  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
-            if tDistance < 16 : tAngle = tAvejAng
+            if tDistance < 16 : tAngle = tAvejAng # and ncount > 2
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.ang) + 180
             if abs(tAngle - self.ang) > 1: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
-            if tDistance < 4 and targetV == (neiboids[0,0],neiboids[0,1]) : turnDir = -turnDir
+            if tDistance < 4 and targetV == nearestBoid : turnDir = -turnDir
         # steers based on turnDir, handles left or right
         if turnDir != 0:
-            self.ang += (10 * dt) * abs(turnDir) / turnDir
+            self.ang += 2 * abs(turnDir) / turnDir
             self.ang %= 360  # ensures that the angle stays within 0-360
 
         self.dir = pg.Vector2(1, 0).rotate(self.ang).normalize()
-        self.pos += self.dir * dt * (4 + (7-neiboids.size)/14)
+        self.pos += self.dir * dt * (3 + (7-ncount)/14)
 
         # Edge Wrap
-        if self.pos[1] < 1 : self.pos[1] = self.maxH - 1
-        elif self.pos[1] > self.maxH : self.pos[1] = 1
+        if self.pos[1] <= 1 : self.pos[1] = self.maxH - 1
+        elif self.pos[1] >= self.maxH : self.pos[1] = 1
         if self.pos[0] < 1 : self.pos[0] = self.maxW - 1
         elif self.pos[0] > self.maxW : self.pos[0] = 1
 
-        # Finally apply results to output
-        self.sdata.boid_array[self.bnum] = [self.pos[0], self.pos[1], self.ang]
-        self.sdata.img_array[(int(self.pos[0]),int(self.pos[1]))] = self.color[:3]
+        self.sArray.img_array[(int(self.pos[0]),int(self.pos[1]))] = self.color[:3]
+
+    def boidinput(self, boidList):
+        self.allBoids = boidList
 
 class surfaceArray():
     def __init__(self, bigSize):
         self.surfSize = (bigSize[0]//PRATIO, bigSize[1]//PRATIO)
         self.image = pg.Surface(self.surfSize).convert()
         self.img_array = np.array(pg.surfarray.array3d(self.image),dtype=float)
-        self.boid_array = np.empty((BOIDZ,3),dtype=float)
     def update(self, dt):
-        self.img_array[self.img_array > 0] -= 32 * (60/FPS/1.5) * ((dt/10) * FPS)
+        self.img_array[self.img_array > 0] -= 20 * (60/FPS) * ((dt/10) * FPS)
         self.img_array = self.img_array.clip(0,255)
         pg.surfarray.blit_array(self.image, self.img_array)
         return self.image
@@ -97,7 +98,8 @@ def main():
 
     drawLayer = surfaceArray(screenSize)
     boidList = []
-    for n in range(BOIDZ) : boidList.append(BoidPix(n, drawLayer))  # spawns # of boidz
+    for n in range(BOIDZ) : boidList.append(BoidPix(drawLayer))  # spawns desired # of boidz
+    for n in range(BOIDZ) : boidList[n].boidinput(boidList)  # gives boids list of all boids
 
     clock = pg.time.Clock()
     fpsChecker = 0
