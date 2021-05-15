@@ -3,7 +3,7 @@ from random import randint
 import pygame as pg
 import numpy as np
 '''
-PixelBoids - Pixel-based Boids alternative, drawn to a fading surfarray.
+PixelBoids - Pixel-based Boids simulation, drawn to a fading surfarray.
 Uses numpy array math in place of math library, less for loops.
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
@@ -58,7 +58,7 @@ class BoidPix():
             self.ang += (10 * dt) * abs(turnDir) / turnDir # turn speed 10
             self.ang %= 360  # keeps angle within 0-360
         self.dir = pg.Vector2(1, 0).rotate(self.ang).normalize()
-        self.pos += self.dir * dt * (4 + (7 - neiboids.size) / 14) # movement speed 4
+        self.pos += self.dir * dt * (4 + (7 - neiboids.size) / 14)  # speed 3-5
 
         # Edge Wrap
         if self.pos[1] < 1 : self.pos[1] = self.maxH - 1
@@ -66,7 +66,7 @@ class BoidPix():
         if self.pos[0] < 1 : self.pos[0] = self.maxW - 1
         elif self.pos[0] > self.maxW : self.pos[0] = 1
 
-        # Finally apply results to output
+        # Finally, output pos/ang to arrays
         self.data.b_array[self.bnum,:3] = [self.pos[0], self.pos[1], self.ang]
         self.data.img_array[(int(self.pos[0]), int(self.pos[1]))] = self.color[:3]
 
@@ -77,7 +77,7 @@ class surfaceArray():
         self.img_array = np.array(pg.surfarray.array3d(self.image), dtype=float)
         self.b_array = np.zeros((BOIDZ, 4), dtype=float)
     def update(self, dt):
-        self.img_array[self.img_array > 0] -= 32 * (60/FPS/1.5) * ((dt/10) * FPS)
+        self.img_array[self.img_array > 0] -= 30 * (60/FPS/1.5) * ((dt/10) * FPS)  # fade
         self.img_array = self.img_array.clip(0,255)
         pg.surfarray.blit_array(self.image, self.img_array)
         return self.image
