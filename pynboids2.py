@@ -6,14 +6,14 @@ import numpy as np
 PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
-FLLSCRN = True          # True for Fullscreen, or False for Window.
-BOIDZ = 150             # How many boids to spawn, too many may slow fps.
-WRAP = False            # False avoids edges, True wraps to other side.
-FISH = False            # True to turn boids into fish.
-SPEED = 170             # Movement speed.
+FLLSCRN = True          # True for Fullscreen, or False for Window
+BOIDZ = 150             # How many boids to spawn, too many may slow fps
+WRAP = False            # False avoids edges, True wraps to other side
+FISH = False            # True to turn boids into fish
+SPEED = 170             # Movement speed
 WIDTH = 1200            # Window Width (1200)
 HEIGHT = 800            # Window Height (800)
-BGCOLOR = (0, 0, 0)     # Background color in RGB.
+BGCOLOR = (0, 0, 0)     # Background color in RGB
 FPS = 48                # 30-90
 SHOWFPS = False         # frame rate debug
 
@@ -68,7 +68,7 @@ class Boid(pg.sprite.Sprite):
             if abs(tAngle - self.ang) > 1.2: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.bSize and targetV == (neiboids[0,0], neiboids[0,1]) : turnDir = -turnDir
-        # Avoids edges of screen by turning toward their surface-normal
+        # Avoid edges of screen by turning toward the edge normal-angle
         if not ejWrap and min(self.pos.x, self.pos.y, maxW - self.pos.x, maxH - self.pos.y) < margin:
             if self.pos.x < margin : tAngle = 0
             elif self.pos.x > maxW - margin : tAngle = 180

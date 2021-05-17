@@ -6,11 +6,11 @@ import pygame as pg
 PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
-FLLSCRN = False         # True for Fullscreen, or False for Window.
-BOIDZ = 88              # How many boids to spawn, may slow after 200ish.
-WRAP = False            # False avoids edges, True wraps boids to other side.
-FISH = False            # True here will turn boids into fish.
-BGCOLOR = (0, 0, 0)     # Background color in RGB.
+FLLSCRN = False         # True for Fullscreen, or False for Window
+BOIDZ = 88              # How many boids to spawn, may slow after 200ish
+WRAP = False            # False avoids edges, True wraps boids to other side
+FISH = False            # True will turn boids into fish
+BGCOLOR = (0, 0, 0)     # Background color in RGB
 WIDTH = 1200            # default 1200
 HEIGHT = 800            # default 800
 FPS = 48                # 48-90
@@ -35,11 +35,11 @@ class Boid(pg.sprite.Sprite):
         self.angle = randint(0, 360)  # random start angle, and position ^
         self.pos = pg.Vector2(self.rect.center)
 
-    def update(self, allBoids, dt, ejWrap=False):  # boid behavior
+    def update(self, allBoids, dt, ejWrap=False):  # behavior
         selfCenter = pg.Vector2(self.rect.center)
         curW, curH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
-        turnRate = 120 * dt #2.4 * fps * dt
+        turnRate = 120 * dt
         margin = 48
         neiboids = sorted([  # gets list of nearby boids, sorted by distance
             iBoid for iBoid in allBoids
@@ -102,7 +102,7 @@ def main():
     # setup fullscreen or window mode
     if FLLSCRN:  #screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
-        screen = pg.display.set_mode(currentRez, pg.SCALED) # pg.FULLSCREEN | #pg.display.toggle_fullscreen()
+        screen = pg.display.set_mode(currentRez, pg.SCALED) # pg.display.toggle_fullscreen()
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
     nBoids = pg.sprite.Group()
@@ -118,6 +118,7 @@ def main():
 
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
+
         nBoids.update(allBoids, dt, WRAP)
         nBoids.draw(screen)
         pg.display.update()

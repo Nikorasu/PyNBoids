@@ -25,7 +25,7 @@ On my PC, I could spawn 300 boids and still maintain 30fps, even 400+ was ok.
 ##### Update (5/14/21):
 `pixelboids.py` version, draws boids as pixels in a surfarray, that fades as
 they move. Distance sorting & for-loop math replaced with numpy array math.
-This version should be able to handle more boids than the original method.
+Uses a fading surfArray to create tails, pixelation makes them look animated.
 
 For more information, and future updates,
 [see github page](https://github.com/Nikorasu/PyNBoids "PyNBoids").
