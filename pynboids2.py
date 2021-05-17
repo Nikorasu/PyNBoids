@@ -9,10 +9,11 @@ Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 FLLSCRN = True          # True for Fullscreen, or False for Window.
 BOIDZ = 150             # How many boids to spawn, too many may slow fps.
 WRAP = False            # False avoids edges, True wraps to other side.
-FISH = False            # True here will turn boids into fish.
-BGCOLOR = (0, 0, 0)     # Background color in RGB.
+FISH = False            # True to turn boids into fish.
+SPEED = 170             # Movement speed.
 WIDTH = 1200            # Window Width (1200)
 HEIGHT = 800            # Window Height (800)
+BGCOLOR = (0, 0, 0)     # Background color in RGB.
 FPS = 48                # 30-90
 SHOWFPS = False         # frame rate debug
 
@@ -37,7 +38,7 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=(randint(50, maxW - 50), randint(50, maxH - 50)))
         self.ang = randint(0, 360)  # random start angle, & position ^
         self.pos = pg.Vector2(self.rect.center)
-    def update(self, allBoids, dt, ejWrap=False):  # boid behavior
+    def update(self, dt, speed, ejWrap=False):
         maxW, maxH = self.drawSurf.get_size()
         turnDir = xvt = yvt = yat = xat = 0
         turnRate = 120 * dt  # about 120 seems ok
@@ -84,7 +85,7 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.orig_image, -self.ang)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.dir = pg.Vector2(1, 0).rotate(self.ang).normalize()
-        self.pos += self.dir * dt * (160 + (7 - neiboids.size) * 2)  # default speed 160
+        self.pos += self.dir * dt * (speed + (7 - neiboids.size) * 2)  # movement speed
         # Optional screen wrap
         if ejWrap and not self.drawSurf.get_rect().contains(self.rect):
             if self.rect.bottom < 0 : self.pos.y = maxH
@@ -129,11 +130,10 @@ def main():
 
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
-        nBoids.update(allBoids, dt, WRAP)
+        nBoids.update(dt, SPEED, WRAP)
         nBoids.draw(screen)
 
-        if SHOWFPS:
-            screen.blit(font.render(str(int(clock.get_fps())), True, [0,200,0]), (8, 8))
+        if SHOWFPS : screen.blit(font.render(str(int(clock.get_fps())), True, [0,200,0]), (8, 8))
 
         pg.display.update()
 
