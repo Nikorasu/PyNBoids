@@ -2,12 +2,12 @@
 ![Preview](preview.gif "Preview")
 
 ### A Python Boids Simulation
-
 This is a [Boids simulation](https://en.wikipedia.org/wiki/Boids "Wikipedia"),
 written in Python3, with Pygame2 and NumPy.
 
 **To use** save the `pynboids_sp.py` file (and `nboids.png` if you want the
 icon, not required) and run via python. (Example: `python3 pynboids.py`)
+
 `Esc` key to quit.
 
 I've included several customizable settings near the top of the code.

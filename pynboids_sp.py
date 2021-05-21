@@ -41,6 +41,8 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=(randint(50, maxW - 50), randint(50, maxH - 50)))
         self.ang = randint(0, 360)  # random start angle, & position ^
         self.pos = pg.Vector2(self.rect.center)
+        self.grid_lastpos = self.grid.getcell(self.pos)
+        self.grid.add(self, self.grid_lastpos)
 
     def update(self, dt, speed, ejWrap=False):
         maxW, maxH = self.drawSurf.get_size()
@@ -48,10 +50,18 @@ class Boid(pg.sprite.Sprite):
         turnDir = xvt = yvt = yat = xat = 0
         turnRate = 120 * dt  # about 120 seems ok
         margin = 42
-        near_boids = self.grid.getnear(self)
+        # Grid update stuff
+        self.grid_pos = self.grid.getcell(self.pos)
+        if self.grid_pos != self.grid_lastpos:
+            self.grid.add(self, self.grid_pos)
+            self.grid.remove(self, self.grid_lastpos)
+            self.grid_lastpos = self.grid_pos
+        # get nearby boids and sort by distance
+        near_boids = self.grid.getnear(self, self.grid_pos)
         neiboids = sorted(near_boids, key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
-        if (ncount := len(neiboids)) > 1:  # when boid has neighborS (walrus sets ncount)
+        # when boid has neighborS (walrus sets ncount)
+        if (ncount := len(neiboids)) > 1:
             nearestBoid = pg.Vector2(neiboids[0].rect.center)
             for nBoid in neiboids:  # adds up neighbor vectors & angles for averaging
                 xvt += nBoid.rect.centerx
@@ -68,19 +78,20 @@ class Boid(pg.sprite.Sprite):
             if tDistance < self.bSize*5 : tAngle = tAvejAng
             # computes the difference to reach target angle, for smooth steering
             angleDiff = (tAngle - self.ang) + 180
-            if abs(tAngle - self.ang) > 0: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
+            if abs(tAngle - self.ang) > .5: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.bSize and targetV == nearestBoid : turnDir = -turnDir
         # Avoid edges of screen by turning toward the edge normal-angle
-        if not ejWrap and min(self.pos.x, self.pos.y, maxW - self.pos.x, maxH - self.pos.y) < margin:
-            if self.pos.x < margin : tAngle = 0
-            elif self.pos.x > maxW - margin : tAngle = 180
-            if self.pos.y < margin : tAngle = 90
-            elif self.pos.y > maxH - margin : tAngle = 270
-            angleDiff = (tAngle - self.ang) + 180  # if in margin, increase turnRate to ensure stays on screen
+        sc_x, sc_y = self.rect.centerx, self.rect.centery
+        if not ejWrap and min(sc_x, sc_y, maxW - sc_x, maxH - sc_y) < margin:
+            if sc_x < margin : tAngle = 0
+            elif sc_x > maxW - margin : tAngle = 180
+            if sc_y < margin : tAngle = 90
+            elif sc_y > maxH - margin : tAngle = 270
+            angleDiff = (tAngle - self.ang) + 180  # increase turnRate to keep boids on screen
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
-            edgeDist = min(self.pos.x, self.pos.y, maxW - self.pos.x, maxH - self.pos.y)
-            turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #minRate+(1-dist/margin)*(maxRate-minRate)
+            edgeDist = min(sc_x, sc_y, maxW - sc_x, maxH - sc_y)
+            turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #turnRate=minRate, 20=maxRate
         if turnDir != 0:  # steers based on turnDir, handles left or right
             self.ang += turnRate * abs(turnDir) / turnDir
             self.ang %= 360  # ensures that the angle stays within 0-360
@@ -104,37 +115,35 @@ class BoidGrid():  # tracks boids in spatial partition grid
     def __init__(self):
         self.grid_size = 100
         self.dict = {}
-
-    def getcell(self, x, y):
-        return (x//self.grid_size, y//self.grid_size)
-
-    def add(self, boid):
-        grid_x, grid_y = self.getcell(boid.pos[0], boid.pos[1])
-        key = (grid_x, grid_y)
-        if key in self.dict.keys():
+    # finds the grid cell corresponding to given pos
+    def getcell(self, pos):
+        return (pos[0]//self.grid_size, pos[1]//self.grid_size)
+    # boids add themselves to cells when crossing into new cell
+    def add(self, boid, key):
+        if key in self.dict:
             self.dict[key].append(boid)
         else:
             self.dict[key] = [boid]
-
-    def getnear(self, boid):
-        x, y = self.getcell(boid.pos[0], boid.pos[1])
-        if (x,y) in self.dict:
+    # they also remove themselves from the previous cell
+    def remove(self, boid, key):
+        if key in self.dict and boid in self.dict[key]:
+            self.dict[key].remove(boid)
+    # Returns a list of nearby boids within all surrounding 9 cells
+    def getnear(self, boid, key):
+        if key in self.dict:
             nearby = []
-            for dx in (-1, 0, 1):
-                for dy in (-1, 0, 1):
-                    nearby += self.dict.get((x + dx, y + dy), [])
+            for x in (-1, 0, 1):
+                for y in (-1, 0, 1):
+                    nearby += self.dict.get((key[0] + x, key[1] + y), [])
             nearby.remove(boid)
         return nearby
-
-    def reset(self):
-        self.dict = {}
 
 
 def main():
     pg.init()  # prepare window
     pg.display.set_caption("PyNBoids")
     try: pg.display.set_icon(pg.image.load("nboids.png"))
-    except: print("FYI: nboids.png icon not found, skipping..")
+    except: print("Note: nboids.png icon not found, skipping..")
     # setup fullscreen or window mode
     if FLLSCRN:
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
@@ -144,9 +153,8 @@ def main():
 
     boidTracker = BoidGrid()
     nBoids = pg.sprite.Group()
-    for n in range(BOIDZ):
-        nBoids.add(Boid(boidTracker, screen, FISH))  # spawns desired # of boidz
-    allBoids = nBoids.sprites()
+    # spawns desired # of boidz
+    for n in range(BOIDZ) : nBoids.add(Boid(boidTracker, screen, FISH))
 
     clock = pg.time.Clock()
     if SHOWFPS : font = pg.font.Font(None, 30)
@@ -159,10 +167,7 @@ def main():
 
         dt = clock.tick(FPS) / 1000
         screen.fill(BGCOLOR)
-
-        boidTracker.reset()
-        for boid in allBoids : boidTracker.add(boid)
-
+        # update boid logic, then draw them
         nBoids.update(dt, SPEED, WRAP)
         nBoids.draw(screen)
         # if true, displays the fps in the upper left corner, for debugging
