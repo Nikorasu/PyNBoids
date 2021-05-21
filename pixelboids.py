@@ -3,8 +3,8 @@ from random import randint
 import pygame as pg
 import numpy as np
 '''
-PixelBoids - Pixel-based Boids simulation, drawn to a fading surfarray
-Uses numpy array math in place of math library, less for loops
+PixelBoids - Pixel-based Boids simulation, drawn to a surfArray.
+Uses numpy array math instead of math lib. github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
 FLLSCRN = True          # True for Fullscreen, or False for Window
@@ -12,7 +12,7 @@ BOIDZ = 100             # Number of Boids
 WIDTH = 1200            # Window Width (1200)
 HEIGHT = 800            # Window Height (800)
 PRATIO = 5              # Pixel Ratio for surfArray
-SPEED = 4               # Movement speed.
+SPEED = 4               # Movement speed
 FADE = 30               # surfArray fade rate, controls tail length
 WRAP = False            # False avoids edges, True wraps to other side
 FPS = 60                # 30-90

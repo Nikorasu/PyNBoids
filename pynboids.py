@@ -3,7 +3,7 @@ from math import sin, cos, atan2, radians, degrees
 from random import randint
 import pygame as pg
 '''
-PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
+PyNBoids - my original Boids simulation - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
 FLLSCRN = False         # True for Fullscreen, or False for Window
@@ -66,7 +66,7 @@ class Boid(pg.sprite.Sprite):
             if abs(tAngle - self.angle) > .8: turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
             # if boid gets too close to target, steer away
             if tDistance < self.pSpace and targetV == nearestBoid : turnDir = -turnDir
-        # Avoids edges of screen by turning toward their surface-normal
+        # Avoid edges of screen by turning toward the edge normal-angle
         if not ejWrap and min(self.pos.x, self.pos.y, curW - self.pos.x, curH - self.pos.y) < margin:
             if self.pos.x < margin : tAngle = 0
             elif self.pos.x > curW - margin : tAngle = 180
