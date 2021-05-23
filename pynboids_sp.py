@@ -147,7 +147,7 @@ def main():
     # setup fullscreen or window mode
     if FLLSCRN:
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
-        screen = pg.display.set_mode(currentRez, pg.SCALED)
+        screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
         pg.mouse.set_visible(False)
     else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
 
@@ -156,8 +156,8 @@ def main():
     # spawns desired # of boidz
     for n in range(BOIDZ) : nBoids.add(Boid(boidTracker, screen, FISH))
 
-    clock = pg.time.Clock()
     if SHOWFPS : font = pg.font.Font(None, 30)
+    clock = pg.time.Clock()
 
     # main loop
     while True:

@@ -5,20 +5,19 @@
 This is a [Boids simulation](https://en.wikipedia.org/wiki/Boids "Wikipedia"),
 written in Python3, with Pygame2 and NumPy.
 
-**To use** save the `pynboids_sp.py` file (and `nboids.png` if you want the
+**To use:** Save the `pynboids_sp.py` file (and `nboids.png` if you want the
 icon, not required) and run via python. (Example: `python3 pynboids.py`)
 
 `Esc` key to quit.
 
-I've included several customizable settings near the top of the code.
+I've included several customizable settings near the top of the code.  
 You can adjust window size, fullscreen, fps, and how many boids to spawn,
 as well as whether they avoid the screen edges or wrap to the other side,
 change the background color, or turn the boids into fish! ;)
 
 ##### Update (5/20/21):
 New `pynboids_sp.py` version, implements a spatial partitioning grid to
-improve efficiency of boids detecting other boids. Most efficient version
-so far! For me, 420 boids at 60fps, 1000 at ~20fps. (Also, 100 commits!)
+improve efficiency of detecting other boids. Most efficient version so far!
 
 ##### Update (5/16/21):
 Added `pynboids2.py` version, an update to the original pynboids, with numpy
@@ -28,6 +27,11 @@ array methods from pixelboids.py to improve efficiency. 2x more boids then b4.
 Added `pixelboids.py` version, draws boids as pixels in surfarray that fades
 as they move. Distance sorting & for-loop math replaced with numpy array math.
 Uses a fading surfArray to create tails, pixelation makes them look animated.
+
+#### Special Thanks:  (Let me know if I forgot anyone.)
+I couldn't have gotten this far without the Pygame Discord channel:  
+CozyFractal, for help with the spatial partition grid & improving efficiency.  
+Mega_JC, Ghast, and bydariogamer, for answering various questions I had.
 
 For more information, and future updates,
 [see github page](https://github.com/Nikorasu/PyNBoids "PyNBoids").
