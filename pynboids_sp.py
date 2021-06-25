@@ -149,7 +149,7 @@ def main():
         currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
         screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
         pg.mouse.set_visible(False)
-    else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
+    else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE | pg.SCALED, vsync=1)
 
     boidTracker = BoidGrid()
     nBoids = pg.sprite.Group()
