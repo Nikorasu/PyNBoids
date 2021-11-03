@@ -162,7 +162,7 @@ def main():
     # main loop
     while True:
         for e in pg.event.get():
-            if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
+            if e.type == pg.QUIT or e.type == pg.KEYDOWN and (e.key == pg.K_ESCAPE or e.key == pg.K_q or e.key==pg.K_SPACE):
                 return
 
         dt = clock.tick(FPS) / 1000
