@@ -47,6 +47,7 @@ class Boid(pg.sprite.Sprite):
         turnDir = xvt = yvt = yat = xat = 0
         turnRate = 120 * dt  # about 120 seems ok
         margin = 42
+        self.ang = self.ang + randint(-4, 4)
         # Grid update stuff
         self.grid_pos = self.grid.getcell(self.pos)
         if self.grid_pos != self.grid_lastpos:
@@ -91,7 +92,7 @@ class Boid(pg.sprite.Sprite):
             turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #turnRate=minRate, 20=maxRate
         if turnDir != 0:  # steers based on turnDir, handles left or right
             self.ang += turnRate * abs(turnDir) / turnDir
-            self.ang %= 360  # ensures that the angle stays within 0-360
+        self.ang %= 360  # ensures that the angle stays within 0-360
         # Adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.orig_image, -self.ang)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
@@ -143,9 +144,7 @@ def pil2pgImage(pilImage):
 
 def main():
     capture = PIL.ImageGrab.grab()
-
     pg.init()
-
     # setup fullscreen or window mode
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)

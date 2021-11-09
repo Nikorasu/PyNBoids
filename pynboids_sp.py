@@ -17,7 +17,7 @@ WIDTH = 1200            # Window Width (1200)
 HEIGHT = 800            # Window Height (800)
 BGCOLOR = (0, 0, 0)     # Background color in RGB
 FPS = 60                # 30-90
-SHOWFPS = False         # frame rate debug
+SHOWFPS = True         # frame rate debug
 
 
 class Boid(pg.sprite.Sprite):
@@ -50,6 +50,7 @@ class Boid(pg.sprite.Sprite):
         turnDir = xvt = yvt = yat = xat = 0
         turnRate = 120 * dt  # about 120 seems ok
         margin = 42
+        self.ang = self.ang + randint(-4, 4)
         # Grid update stuff
         self.grid_pos = self.grid.getcell(self.pos)
         if self.grid_pos != self.grid_lastpos:
@@ -94,7 +95,7 @@ class Boid(pg.sprite.Sprite):
             turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #turnRate=minRate, 20=maxRate
         if turnDir != 0:  # steers based on turnDir, handles left or right
             self.ang += turnRate * abs(turnDir) / turnDir
-            self.ang %= 360  # ensures that the angle stays within 0-360
+        self.ang %= 360  # ensures that the angle stays within 0-360
         # Adjusts angle of boid image to match heading
         self.image = pg.transform.rotate(self.orig_image, -self.ang)
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
