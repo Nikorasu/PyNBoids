@@ -1,28 +1,27 @@
 #!/usr/bin/env python3
 from math import pi, sin, cos, atan2, radians, degrees
+from subprocess import getoutput
 from random import randint
+from time import sleep
 import pygame as pg
 
 '''
-PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
-This version uses a spatial partitioning grid to improve performance.
+NBoids ScreenSaver version - Linux ONLY - github.com/Nikorasu/PyNBoids
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
-FLLSCRN = True          # True for Fullscreen, or False for Window
+SAVERTIME = 900         # How long before the screensaver starts, in seconds
 BOIDZ = 200             # How many boids to spawn, too many may slow fps
 WRAP = False            # False avoids edges, True wraps to other side
-FISH = False            # True to turn boids into fish
-SPEED = 150             # Movement speed
-WIDTH = 1200            # Window Width (1200)
-HEIGHT = 800            # Window Height (800)
+FISH = False            # True to turn boids into fish, False for birds
 BGCOLOR = (0, 0, 0)     # Background color in RGB
+SPEED = 150             # Movement speed of boids
 FPS = 60                # 30-90
 SHOWFPS = False         # frame rate debug
 
 
 class Boid(pg.sprite.Sprite):
 
-    def __init__(self, grid, drawSurf, isFish=False):  #, cHSV=None
+    def __init__(self, grid, drawSurf, isFish=False):
         super().__init__()
         self.grid = grid
         self.drawSurf = drawSurf
@@ -140,18 +139,12 @@ class BoidGrid():  # tracks boids in spatial partition grid
         return nearby
 
 
-def main():
+def ScreenSaver():
     pg.init()  # prepare window
-    pg.display.set_caption("PyNBoids")
-    try: pg.display.set_icon(pg.image.load("nboids.png"))
-    except: print("Note: nboids.png icon not found, skipping..")
-    # setup fullscreen or window mode
-    if FLLSCRN:
-        currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
-        screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
-        pg.mouse.set_visible(False)
-    else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE | pg.SCALED, vsync=1)
-
+    currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
+    screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
+    pg.mouse.set_visible(False)
+    
     boidTracker = BoidGrid()
     nBoids = pg.sprite.Group()
     # spawns desired # of boidz
@@ -160,10 +153,11 @@ def main():
     if SHOWFPS : font = pg.font.Font(None, 30)
     clock = pg.time.Clock()
 
-    # main loop
+    # run screensaver loop untill input
     while True:
-        for e in pg.event.get():
-            if e.type == pg.QUIT or e.type == pg.KEYDOWN and (e.key == pg.K_ESCAPE or e.key == pg.K_q or e.key==pg.K_SPACE):
+        for e in pg.event.get(): #or e.type == pg.MOUSEMOTION: #and (e.key == pg.K_ESCAPE or e.key == pg.K_q or e.key==pg.K_SPACE):
+            if e.type == pg.QUIT or e.type == pg.KEYDOWN or e.type == pg.MOUSEBUTTONDOWN:
+                pg.quit()
                 return
 
         dt = clock.tick(FPS) / 1000
@@ -176,6 +170,11 @@ def main():
 
         pg.display.update()
 
+
 if __name__ == '__main__':
-    main()  # by Nik
-    pg.quit()
+    #ScreenSaver() #debug
+    while True:
+        sleep(60)
+        idletime = int(getoutput('xprintidle')) / 1000
+        #print(idletime) #debug
+        if idletime > SAVERTIME: ScreenSaver()

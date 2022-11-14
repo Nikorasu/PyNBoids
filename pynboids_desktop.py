@@ -5,8 +5,8 @@ import PIL.ImageGrab
 import pygame as pg
 
 '''
-PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
-This version uses a spatial partitioning grid to improve performance.
+nBoids drawn over desktop screenshot - github.com/Nikorasu/PyNBoids
+This version also uses the spatial partitioning grid to improve performance.
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
 BOIDZ = 200             # How many boids to spawn, too many may slow fps
@@ -138,20 +138,20 @@ class BoidGrid():  # tracks boids in spatial partition grid
 
 
 def pil2pgImage(pilImage):
-    return pg.image.fromstring(
-        pilImage.tobytes(), pilImage.size, pilImage.mode).convert()
+    return pg.image.fromstring(pilImage.tobytes(), pilImage.size, pilImage.mode).convert()
 
 
 def main():
-    capture = PIL.ImageGrab.grab()
+    pg.time.wait(200)
+    capture = PIL.ImageGrab.grab(xdisplay="")
+    pg.time.wait(100)
     pg.init()
-    # setup fullscreen or window mode
+    # setup screen
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
     pg.mouse.set_visible(False)
-
+    # use screenshot as background
     background = pil2pgImage(capture)
-
     boidTracker = BoidGrid()
     nBoids = pg.sprite.Group()
     # spawns desired # of boidz

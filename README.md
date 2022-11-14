@@ -15,6 +15,10 @@ You can adjust window size, fullscreen, fps, and how many boids to spawn,
 as well as whether they avoid the screen edges or wrap to the other side,
 change the background color, or turn the boids into fish! ;)
 
+##### Update (11/14/22):
+Minor updates to several files. New `nboids_ss.py` version is a linux-only
+pseudo-screensaver that **_requires_** _xprintidle_ be installed, to work.
+
 ##### Update (5/20/21):
 New `pynboids_sp.py` version, implements a spatial partitioning grid to
 improve efficiency of detecting other boids. Most efficient version so far!
