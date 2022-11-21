@@ -152,9 +152,9 @@ def ScreenSaver():
     if SHOWFPS : font = pg.font.Font(None, 30)
     clock = pg.time.Clock()
 
-    # run screensaver untill input
+    # run screensaver until input
     while True:
-        for e in pg.event.get(): #or e.type == pg.MOUSEMOTION: #and (e.key == pg.K_ESCAPE or e.key == pg.K_q or e.key==pg.K_SPACE):
+        for e in pg.event.get(): # quits if any key or mouse button is pressed
             if e.type == pg.QUIT or e.type == pg.KEYDOWN or e.type == pg.MOUSEBUTTONDOWN:
                 pg.quit()
                 return
@@ -171,4 +171,4 @@ def ScreenSaver():
 
 
 if __name__ == '__main__':
-    ScreenSaver()
+    ScreenSaver()  # nboids_ss.py is meant to be launched by run_ss.py, as it's own process.
