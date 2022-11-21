@@ -17,7 +17,8 @@ change the background color, or turn the boids into fish! ;)
 
 ##### Update (11/14/22):
 Minor updates to several files. New `nboids_ss.py` version is a linux-only
-pseudo-screensaver that **_requires_** _xprintidle_ be installed, to work.
+pseudo-screensaver that **_requires_** _xprintidle_ be installed. BUT, due
+to a possible memory leak, the screensaver must be started using `run_ss.py`.
 
 ##### Update (5/20/21):
 New `pynboids_sp.py` version, implements a spatial partitioning grid to

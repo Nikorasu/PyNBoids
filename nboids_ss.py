@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 from math import pi, sin, cos, atan2, radians, degrees
-from subprocess import getoutput
 from random import randint
 from time import sleep
 import pygame as pg
 
 '''
-NBoids ScreenSaver version - Linux ONLY - github.com/Nikorasu/PyNBoids
-Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
+NBoids - Version for ScreenSaver - github.com/Nikorasu/PyNBoids
+Copyright (c) 2022  Nikolaus Stromberg  github.com/Nikorasu/PyNBoids
 '''
-SAVERTIME = 900         # How long before the screensaver starts, in seconds
+
 BOIDZ = 200             # How many boids to spawn, too many may slow fps
 WRAP = False            # False avoids edges, True wraps to other side
 FISH = False            # True to turn boids into fish, False for birds
@@ -144,7 +143,7 @@ def ScreenSaver():
     currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
     screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
     pg.mouse.set_visible(False)
-    
+
     boidTracker = BoidGrid()
     nBoids = pg.sprite.Group()
     # spawns desired # of boidz
@@ -153,7 +152,7 @@ def ScreenSaver():
     if SHOWFPS : font = pg.font.Font(None, 30)
     clock = pg.time.Clock()
 
-    # run screensaver loop untill input
+    # run screensaver untill input
     while True:
         for e in pg.event.get(): #or e.type == pg.MOUSEMOTION: #and (e.key == pg.K_ESCAPE or e.key == pg.K_q or e.key==pg.K_SPACE):
             if e.type == pg.QUIT or e.type == pg.KEYDOWN or e.type == pg.MOUSEBUTTONDOWN:
@@ -172,9 +171,4 @@ def ScreenSaver():
 
 
 if __name__ == '__main__':
-    #ScreenSaver() #debug
-    while True:
-        sleep(60)
-        idletime = int(getoutput('xprintidle')) / 1000
-        #print(idletime) #debug
-        if idletime > SAVERTIME: ScreenSaver()
+    ScreenSaver()
